@@ -4,6 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 
 public class HomeScreen extends ActionBarActivity {
@@ -11,8 +12,9 @@ public class HomeScreen extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_screen);
     }
+
+
 
 
     @Override
@@ -36,4 +38,13 @@ public class HomeScreen extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Handles all activities when app resumes.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
 }
