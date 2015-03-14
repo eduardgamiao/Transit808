@@ -15,4 +15,5 @@
     <string name="action_example">Example action</string>
 
     <string name="hea_url">http://api.thebus.org/arrivals/?key=API_key&amp;stop=stop_ID</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
