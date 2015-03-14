@@ -13,4 +13,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_example">Example action</string>
+    <string name="Fragment1">Home</string>
+    <string name="Fragment2">Times</string>
+    <string name="Fragment3">Trips</string>
 </resources>
