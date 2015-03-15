@@ -8,6 +8,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 
 public class BusStopSearchActivity extends ActionBarActivity {
 
@@ -20,7 +24,7 @@ public class BusStopSearchActivity extends ActionBarActivity {
         TextView textView = new TextView(this);
         textView.setTextSize(40);
         textView.setText(message);
-        Log.i("URL", prepareURL(message));
+        getStops(message);
     }
 
 
@@ -50,5 +54,22 @@ public class BusStopSearchActivity extends ActionBarActivity {
         String result = getResources().getString(R.string.hea_url).replace("API_key",
                 getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
         return result;
+    }
+
+    private void getStops(String searchTerm) {
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(
+                    new InputStreamReader(getAssets().open("stops.txt")));
+            String currentLine;
+            while ((currentLine = br.readLine()) != null) {
+                if (currentLine.contains(searchTerm.toUpperCase())) {
+                    Log.i("BUS STOP", currentLine);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
