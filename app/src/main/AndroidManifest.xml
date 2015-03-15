@@ -10,6 +10,10 @@
         <activity
             android:name=".Home"
             android:label="@string/title_activity_home" >
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,12 +21,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
-        <activity
             android:name=".ArrivalActivity"
             android:label="@string/title_activity_arrival" >
+        </activity>
+        <activity
+            android:name=".BusStopSearchActivity"
+            android:label="@string/title_activity_bus_stop_search" >
         </activity>
     </application>
 

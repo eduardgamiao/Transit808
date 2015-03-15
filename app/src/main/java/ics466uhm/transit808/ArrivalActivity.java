@@ -1,12 +1,17 @@
 package ics466uhm.transit808;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 
 public class ArrivalActivity extends ActionBarActivity {
+    public final static String SEARCH_TERM = "ics466uhm.transit808.SEARCH_TERM";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,5 +40,15 @@ public class ArrivalActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void submitSearch(View view) {
+        Intent intent = new Intent(this, BusStopSearchActivity.class);
+        EditText searchTerm = (EditText) findViewById(R.id.arrivalSearch);
+        if (searchTerm != null) {
+            String input = searchTerm.getText().toString();
+            intent.putExtra(SEARCH_TERM, input);
+            startActivity(intent);
+        }
     }
 }

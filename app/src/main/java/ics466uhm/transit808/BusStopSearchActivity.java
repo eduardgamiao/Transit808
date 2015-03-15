@@ -3,24 +3,31 @@ package ics466uhm.transit808;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.TextView;
 
 
-public class MainActivity extends ActionBarActivity {
+public class BusStopSearchActivity extends ActionBarActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
+        String message = intent.getStringExtra(ArrivalActivity.SEARCH_TERM);
+        TextView textView = new TextView(this);
+        textView.setTextSize(40);
+        textView.setText(message);
+        Log.i("URL", prepareURL(message));
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_bus_stop_search, menu);
         return true;
     }
 
@@ -39,8 +46,9 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void switchToArrival(View view) {
-        Intent intent = new Intent(this, ArrivalActivity.class);
-        startActivity(intent);
+    private String prepareURL(String busStopID) {
+        String result = getResources().getString(R.string.hea_url).replace("API_key",
+                getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
+        return result;
     }
 }
