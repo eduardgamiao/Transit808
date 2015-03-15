@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Transit808</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">Hello world</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_home">Home</string>
 
@@ -15,4 +15,7 @@
     <string name="action_example">Example action</string>
 
     <string name="hea_url">http://api.thebus.org/arrivals/?key=API_key&amp;stop=stop_ID</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_arrival">ArrivalActivity</string>
+    <string name="arrivalHelpText">Enter Street Name/Bus Stop Number</string>
 </resources>
