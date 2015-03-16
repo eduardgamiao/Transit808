@@ -26,7 +26,7 @@ import java.util.List;
 public class BusStopSearchActivity extends ActionBarActivity {
 
     private ListView listView;
-    ArrayAdapter<String> adapter;
+    BusStopAdapter adapter;
     EditText editText;
 
     @Override
@@ -34,30 +34,30 @@ public class BusStopSearchActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_result);
 
-        String stops[] = getStops();
-        Log.i("onCREATE", "" + stops.length);
+        ArrayList stops = (ArrayList) getStops();
 
         listView = (ListView) findViewById(R.id.results);
         editText = (EditText) findViewById(R.id.inputSearch);
 
         // Adding items to list view.
-        adapter = new ArrayAdapter<String>(this, R.layout.list_item, R.id.busStop, stops);
+        //adapter = new ArrayAdapter<BusStop>(this, R.layout.list_item, R.id.busStop, stops);
+        adapter = new BusStopAdapter(this, R.layout.list_item, stops);
         listView.setAdapter(adapter);
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO
+
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                BusStopSearchActivity.this.adapter.getFilter().filter(s);
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO
+                BusStopSearchActivity.this.adapter.getFilter().filter(s);
             }
         });
 
@@ -100,8 +100,8 @@ public class BusStopSearchActivity extends ActionBarActivity {
         return result;
     }
 
-    private String[] getStops() {
-        List<String> stops = new ArrayList<String>();
+    private List<BusStop> getStops() {
+        List<BusStop> stops = new ArrayList<BusStop>();
         BufferedReader br = null;
 
         try {
@@ -111,12 +111,12 @@ public class BusStopSearchActivity extends ActionBarActivity {
             String []lineArray;
             while ((currentLine = br.readLine()) != null) {
                 lineArray = currentLine.split(",");
-                stops.add(lineArray[7] + "(# " + lineArray[1] + " )");
+                stops.add(new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return stops.toArray(new String[stops.size()]);
+        return stops;
     }
 }
