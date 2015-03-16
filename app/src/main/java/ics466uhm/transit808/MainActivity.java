@@ -40,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void switchToArrival(View view) {
-        Intent intent = new Intent(this, ArrivalActivity.class);
+        Intent intent = new Intent(this, BusStopSearchActivity.class);
         startActivity(intent);
     }
 }

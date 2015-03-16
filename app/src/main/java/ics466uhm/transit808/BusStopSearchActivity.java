@@ -3,28 +3,60 @@ package ics466uhm.transit808;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class BusStopSearchActivity extends ActionBarActivity {
 
+    private ListView listView;
+    ArrayAdapter<String> adapter;
+    EditText editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        String message = intent.getStringExtra(ArrivalActivity.SEARCH_TERM);
-        TextView textView = new TextView(this);
-        textView.setTextSize(40);
-        textView.setText(message);
-        getStops(message);
+        setContentView(R.layout.search_result);
+
+        String stops[] = getStops();
+        Log.i("onCREATE", "" + stops.length);
+
+        listView = (ListView) findViewById(R.id.results);
+        editText = (EditText) findViewById(R.id.inputSearch);
+
+        // Adding items to list view.
+        adapter = new ArrayAdapter<String>(this, R.layout.list_item, R.id.busStop, stops);
+        listView.setAdapter(adapter);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                BusStopSearchActivity.this.adapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO
+            }
+        });
     }
 
 
@@ -56,20 +88,23 @@ public class BusStopSearchActivity extends ActionBarActivity {
         return result;
     }
 
-    private void getStops(String searchTerm) {
+    private String[] getStops() {
+        List<String> stops = new ArrayList<String>();
         BufferedReader br = null;
 
         try {
             br = new BufferedReader(
                     new InputStreamReader(getAssets().open("stops.txt")));
             String currentLine;
+            String []lineArray;
             while ((currentLine = br.readLine()) != null) {
-                if (currentLine.contains(searchTerm.toUpperCase())) {
-                    Log.i("BUS STOP", currentLine);
-                }
+                lineArray = currentLine.split(",");
+                stops.add(lineArray[7] + "(# " + lineArray[1] + " )");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return stops.toArray(new String[stops.size()]);
     }
 }
