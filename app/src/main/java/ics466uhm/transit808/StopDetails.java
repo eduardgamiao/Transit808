@@ -1,11 +1,23 @@
 package ics466uhm.transit808;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.net.URL;
 
 
 public class StopDetails extends ActionBarActivity {
@@ -16,9 +28,18 @@ public class StopDetails extends ActionBarActivity {
         setContentView(R.layout.activity_stop_details);
         Intent intent = getIntent();
         TextView title = (TextView) findViewById(R.id.details_stop_title);
-        title.setText(prepareURL(intent.getStringExtra(BusStopSearchActivity.BUS_STOP_ID)));
+        String stopID = intent.getStringExtra(BusStopSearchActivity.BUS_STOP_ID);
+        title.setText(intent.getStringExtra(BusStopSearchActivity.STREET_NAME_MESSAGE + "(#") + stopID + ")");
+        RetrieveFeed feed = new RetrieveFeed();
+        feed.execute(prepareURL(stopID));
     }
 
+    public String prepareURL(String busStopID) {
+        String result = getResources().getString(R.string.hea_url).replace("API_key",
+                getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
+        Log.i("URL", result);
+        return result;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -42,9 +63,36 @@ public class StopDetails extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String prepareURL(String busStopID) {
-        String result = getResources().getString(R.string.hea_url).replace("API_key",
-                getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
-        return result;
+    class RetrieveFeed extends AsyncTask<String, Integer, String> {
+        public RetrieveFeed() {
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            if (params != null || params.length > 0) {
+                Log.i("PARAM CHECK", params.toString());
+                getXMLFromURL(params[0]);
+            }
+            return "SUCCESS";
+        }
+
+        public String getXMLFromURL(String url) {
+            String xml = url;
+
+            try {
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                HttpEntity httpEntity = httpResponse.getEntity();
+                xml = EntityUtils.toString(httpEntity);
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.i("XML", xml);
+            return xml;
+        }
     }
 }
