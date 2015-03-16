@@ -8,10 +8,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,6 +58,15 @@ public class BusStopSearchActivity extends ActionBarActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 // TODO
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                 Toast.makeText(getApplicationContext(),
+                         parent.getAdapter().getItem(position).toString(),
+                         Toast.LENGTH_SHORT).show();
             }
         });
     }
