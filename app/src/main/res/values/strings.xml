@@ -20,4 +20,6 @@
     <string name="arrivalHelpText">Enter Street Name/Bus Stop Number</string>
     <string name="title_activity_bus_stop_search">BusStopSearchActivity</string>
     <string name="search_hint">Enter Street Name or Bus Stop Number</string>
+    <string name="title_activity_stop_details">StopDetails</string>
+    <string name="bus_stop_label">Bus Stop:</string>
 </resources>

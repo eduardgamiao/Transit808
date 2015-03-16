@@ -29,6 +29,11 @@ public class BusStopSearchActivity extends ActionBarActivity {
     BusStopAdapter adapter;
     EditText editText;
 
+    // Variables for sending to details activity.
+    public final static String STREET_NAME_MESSAGE = "ics466uhm.transit808.STREET";
+    public final static String BUS_STOP_ID = "ics466uhm.transit808.STOP_ID";
+    public final static String STOP_COORDINATES = "ics466uhm.transit808.COORDINATES";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,11 @@ public class BusStopSearchActivity extends ActionBarActivity {
                  Toast.makeText(getApplicationContext(),
                          parent.getAdapter().getItem(position).toString(),
                          Toast.LENGTH_SHORT).show();
+                BusStop stop = (BusStop) parent.getAdapter().getItem(position);
+                Intent intent = new Intent(BusStopSearchActivity.this, StopDetails.class);
+                intent.putExtra(STREET_NAME_MESSAGE, stop.getStreetName());
+                intent.putExtra(BUS_STOP_ID, stop.getStopID());
+                startActivity(intent);
             }
         });
     }
@@ -92,12 +102,6 @@ public class BusStopSearchActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private String prepareURL(String busStopID) {
-        String result = getResources().getString(R.string.hea_url).replace("API_key",
-                getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
-        return result;
     }
 
     private List<BusStop> getStops() {
