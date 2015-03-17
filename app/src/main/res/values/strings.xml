@@ -22,4 +22,9 @@
     <string name="search_hint">Enter Street Name or Bus Stop Number</string>
     <string name="title_activity_stop_details">StopDetails</string>
     <string name="bus_stop_label">Bus Stop:</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="title_activity_trips">Trips</string>
+    <string name="load_directions">Create Trip</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
