@@ -191,8 +191,13 @@ public class Trips extends ActionBarActivity {
                 HttpRequest request = requestFactory.buildGetRequest(buildURL("Honolulu,HI", "Aiea,HI"));
                 HttpResponse httpResponse = request.execute();
                 DirectionsResult directionsResult = httpResponse.parseAs(DirectionsResult.class);
-                String encodedPoints = directionsResult.routes.get(0).overviewPolyLine.points;
-                latLngs = PolyUtil.decode(encodedPoints);
+                List<Route> routes = directionsResult.routes;
+                for (Route route : routes) {
+                    List<Legs> legs = route.legs;
+                    for (Legs leg : legs) {
+                        System.out.println(legs.toString());
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -204,7 +209,7 @@ public class Trips extends ActionBarActivity {
         }
 
         protected void onPostExecute(String result) {
-            Log.i("PLEASE", "WORK...");
+
         }
     }
 
@@ -214,6 +219,7 @@ public class Trips extends ActionBarActivity {
         url.put("origin", origin);
         url.put("destination", destination);
         url.put("sensor", false);
+        url.put("mode", "transit");
         Log.i("URL_DIRECTIONS", url.toString());
         return url;
     }
@@ -238,12 +244,22 @@ public class Trips extends ActionBarActivity {
     }
 
     public static class Route {
-        @Key("overview_polyline")
-        public OverviewPolyLine overviewPolyLine;
+        @Key("legs")
+        public List<Legs> legs;
     }
 
-    public static class OverviewPolyLine {
-        @Key("points")
-        public String points;
+    public static class Legs {
+        @Key("steps")
+        public List<Step> steps;
+    }
+
+    public static class Mode {
+        @Key("travel_mode")
+        public String mode;
+    }
+
+    public static class Step {
+        @Key("html_instructions")
+        public String instructions;
     }
 }
