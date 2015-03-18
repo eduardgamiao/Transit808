@@ -1,17 +1,28 @@
 package ics466uhm.transit808;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AutoCompleteTextView;
 
 
 public class Trips extends ActionBarActivity {
-
+    private AutoCompleteTextView from;
+    private AutoCompleteTextView to;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trip_planner);
+
+        from = (AutoCompleteTextView) findViewById(R.id.from);
+        to = (AutoCompleteTextView) findViewById(R.id.to);
+
+        from.setText("");
+        to.setText("");
+
+        from.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
+        to.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
     }
 
     @Override
