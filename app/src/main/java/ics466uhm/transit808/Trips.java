@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -26,10 +27,31 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.maps.android.PolyUtil;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 
 public class Trips extends ActionBarActivity {
@@ -40,7 +62,7 @@ public class Trips extends ActionBarActivity {
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static final String PLACES_API_AUTOCOMPLETION = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
-    private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
+    private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/xml?";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +79,7 @@ public class Trips extends ActionBarActivity {
         to.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
 
         DirectionsFetcher df = new DirectionsFetcher();
-        df.execute();
+        df.execute(buildURL("1473 Haloa Drive,HI", "University of Hawaii at Manoa,HI").toString());
     }
 
     @Override
@@ -171,15 +193,53 @@ public class Trips extends ActionBarActivity {
         }
     }
 
-    private class DirectionsFetcher extends AsyncTask<URL, Integer, String> {
+    private class DirectionsFetcher extends AsyncTask<String, Integer, String> {
+        static final String PARENT_ELEMENT = "step";
+        static final String KEY_HTML_INSTRUCTION = "html_instructions";
+        private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
 
         public DirectionsFetcher() {
 
         }
 
-        private List<LatLng> latLngs = new ArrayList<LatLng>();
         @Override
-        protected String doInBackground(URL... params) {
+        protected String doInBackground(String... params) {
+
+            String xml = getXMLFromURL(params[0]);
+
+            /**
+            try {
+                XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+                factory.setNamespaceAware(true);
+                XmlPullParser xpp = factory.newPullParser();
+                xpp.setInput(new StringReader(xml));
+                int eventType = xpp.getEventType();
+                Log.i("HERE", "I AM");
+                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    xpp.require(XmlPullParser.START_TAG, null, "html_instructions");
+                    eventType = xpp.next();
+                }
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+             **/
+
+            Document doc = this.getDomElement(xml);
+            NodeList nodeList = doc.getElementsByTagName(PARENT_ELEMENT);
+            Log.i("SIZE", "" + nodeList.getLength());
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                HashMap<String, String> map = new HashMap<String, String>();
+                Element e = (Element) nodeList.item(i);
+                map.put(KEY_HTML_INSTRUCTION, getValue(e, KEY_HTML_INSTRUCTION));
+                Log.i("SIZE", "" + map.get(KEY_HTML_INSTRUCTION));
+                arrivals.add(map);
+            }
+
+            return "SUCCESS";
+            /**
             try {
                 HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
                     @Override
@@ -201,7 +261,7 @@ public class Trips extends ActionBarActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
+             **/
         }
 
         protected void onProgressUpdate(Integer... progress) {
@@ -211,6 +271,65 @@ public class Trips extends ActionBarActivity {
         protected void onPostExecute(String result) {
 
         }
+
+        public Document getDomElement(String xml) {
+            Document doc = null;
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(xml));
+                doc = db.parse(is);
+
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return doc;
+        }
+
+        public String getXMLFromURL(String url) {
+            String xml = url;
+
+            try {
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpPost httpPost = new HttpPost(url);
+
+                org.apache.http.HttpResponse httpResponse = httpClient.execute(httpPost);
+                HttpEntity httpEntity = httpResponse.getEntity();
+                xml = EntityUtils.toString(httpEntity);
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return xml;
+        }
+
+        public String getValue(Element item, String str) {
+            NodeList nodeList = item.getElementsByTagName(str);
+            return this.getElementValue(nodeList.item(0));
+        }
+
+        public final String getElementValue(Node element) {
+            Node child;
+            if (element != null) {
+                if (element.hasChildNodes()) {
+                    for (child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+                        if(child.getNodeType() == Node.TEXT_NODE) {
+                            return child.getNodeValue();
+                        }
+                    }
+                }
+            }
+            return "";
+        }
+
     }
 
     private GenericUrl buildURL(String origin, String destination) {
