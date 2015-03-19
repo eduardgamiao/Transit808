@@ -20,7 +20,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal"
+        android:drawablePadding="8dp"
         android:completionThreshold="3"/>
+
+    <TextView
+        android:id="@+id/fillFrom"
+        android:layout_gravity="end"
+        android:onClick="loadCurrentLocation"
+        android:clickable="true"
+        android:text="@string/fill_from"/>
 
     <TextView
         android:id="@+id/to_label"
@@ -41,5 +49,6 @@
         android:layout_gravity="fill_horizontal"
         android:text="@string/load_directions"
         android:onClick="createTrip"/>
+
 
 </GridLayout>

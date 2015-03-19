@@ -1,8 +1,12 @@
 package ics466uhm.transit808;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -13,7 +17,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -37,44 +46,89 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-public class Trips extends ActionBarActivity {
+public class Trips extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
     private AutoCompleteTextView from;
     private AutoCompleteTextView to;
+
+    private DirectionStepAdapter adapter;
 
     private List<String> resultList = new ArrayList<String>();
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static final String PLACES_API_AUTOCOMPLETION = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
     private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
+    private GoogleApiClient mGoogleApiClient;
+    private String address = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trip_planner);
+        buildGoogleApiClient();
 
         from = (AutoCompleteTextView) findViewById(R.id.from);
         to = (AutoCompleteTextView) findViewById(R.id.to);
 
-        from.setText("");
+        from.setText(this.address);
         to.setText("");
+
 
         from.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
         to.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    public void loadCurrentLocation(View view) {
+        from.setText(this.address);
+    }
+
+    private void setCurrentLocation() {
+        try {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        if (mGoogleApiClient.isConnected()) {
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (mLastLocation != null) {
+                   List<Address> addressList = geocoder.getFromLocation(mLastLocation.getLatitude(),
+                           mLastLocation.getLongitude(), 1);
+                   if (addressList != null || addressList.isEmpty()) {
+                       Address address = addressList.get(0);
+                       ArrayList<String> addressFragments = new ArrayList<String>();
+
+                       if (address != null) {
+                           this.address = address.getAddressLine(0) + ", " + address.getThoroughfare() + ", "
+                                   + address.getLocality() + ", " + address.getAdminArea();
+                       }
+                   }
+                   else {
+                       Toast.makeText(this, "Could not access your current location.", Toast.LENGTH_LONG);
+                   }
+            }
+        }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -105,12 +159,47 @@ public class Trips extends ActionBarActivity {
 
         Log.i("Create", from.getText() + " -> " + to.getText());
 
-        DirectionsFetcher df = new DirectionsFetcher();
+        DirectionsFetcher df = new DirectionsFetcher(this);
 
         String fromText = from.getText().toString();
         String toText = to.getText().toString();
 
         df.execute(fromText, toText);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        setCurrentLocation();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 
     /**
@@ -202,14 +291,12 @@ public class Trips extends ActionBarActivity {
     }
 
     private class DirectionsFetcher extends AsyncTask<String, Integer, String> {
-        static final String PARENT_ELEMENT = "step";
-        static final String KEY_HTML_INSTRUCTION = "html_instructions";
-        static final String KEY_HTML_DEPARTURE_STOP = "name";
-        static final String KEY_HTML_ARRIVAL_STOP = "arrival_stop";
+        private ArrayList<DirectionStep> tripDirections = new ArrayList<>();
         private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
+        private Context context;
 
-        public DirectionsFetcher() {
-
+        public DirectionsFetcher(Context context) {
+            this.context = context;
         }
 
         @Override
@@ -240,14 +327,28 @@ public class Trips extends ActionBarActivity {
                 HttpRequest request = requestFactory.buildGetRequest(buildURLDirections(params[0], params[1]));
                 HttpResponse httpResponse = request.execute();
                 DirectionsResult directions = httpResponse.parseAs(DirectionsResult.class);
-                int steps = directions.routes.get(0).step.get(0).instruction.size();
-                for (int i = 0; i < steps; i++) {
-                    Log.i("INSTRUCTION", directions.routes.get(0).step.get(0).instruction.get(i).instructions);
-                    if (directions.routes.get(0).step.get(0).instruction.get(i).details != null) {
-                        Log.i("DETAIL", directions.routes.get(0).step.get(0).instruction.get(i).details.departure.name);
-                        Log.i("DETAIL", directions.routes.get(0).step.get(0).instruction.get(i).details.arrival.name);
+                if (directions.status.equals("OK")) {
+                    int steps = directions.routes.get(0).step.get(0).instruction.size();
+                    for (int i = 0; i < steps; i++) {
+                        String instruction = directions.routes.get(0).step.get(0).instruction.get(i)
+                                .instructions;
+                        if (directions.routes.get(0).step.get(0).instruction.get(i).details != null) {
+                            String departure = directions.routes.get(0).step.get(0).instruction.get(i)
+                                    .details.departure.name;
+                            String arrival = directions.routes.get(0).step.get(0).instruction.get(i)
+                                    .details.arrival.name;
+                            tripDirections.add(new DirectionStep(instruction, departure, arrival));
+                        } else {
+                            tripDirections.add(new DirectionStep(instruction));
+                        }
                     }
                 }
+                else {
+                    Looper.prepare();
+                    Toast.makeText(context, getResources().getString(R.string.invalid_trip), Toast.LENGTH_LONG);
+                }
+
+                Log.i("FULL DIRECTIONS", tripDirections.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -259,11 +360,7 @@ public class Trips extends ActionBarActivity {
         }
 
         protected void onPostExecute(String result) {
-            /**
-            for (HashMap<String, String> arrival : arrivals) {
-                Log.i("STEPS", arrival.get(KEY_HTML_INSTRUCTION) + " (" + arrival.get(KEY_HTML_DEPARTURE_STOP) + ")");
-            }
-             **/
+
         }
 
         public Document getDomElement(String xml) {
@@ -352,9 +449,17 @@ public class Trips extends ActionBarActivity {
         public String id;
     }
 
+    public static class RouteStatus {
+        @Key("status")
+        public String status;
+    }
+
     public static class DirectionsResult {
         @Key("routes")
         public List<Route> routes;
+
+        @Key("status")
+        public String status;
     }
 
     public static class Route {
