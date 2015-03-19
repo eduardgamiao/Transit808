@@ -5,15 +5,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -25,7 +25,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
-import com.google.maps.android.PolyUtil;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -44,7 +43,6 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +60,7 @@ public class Trips extends ActionBarActivity {
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static final String PLACES_API_AUTOCOMPLETION = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
-    private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/xml?";
+    private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +75,6 @@ public class Trips extends ActionBarActivity {
 
         from.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
         to.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
-
-        DirectionsFetcher df = new DirectionsFetcher();
-        df.execute(buildURL("1473 Haloa Drive,HI", "University of Hawaii at Manoa,HI").toString());
     }
 
     @Override
@@ -102,6 +97,20 @@ public class Trips extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void createTrip(View view) {
+        EditText from = (EditText) findViewById(R.id.from);
+        EditText to = (EditText) findViewById(R.id.to);
+
+        Log.i("Create", from.getText() + " -> " + to.getText());
+
+        DirectionsFetcher df = new DirectionsFetcher();
+
+        String fromText = from.getText().toString();
+        String toText = to.getText().toString();
+
+        df.execute(fromText, toText);
     }
 
     /**
@@ -136,7 +145,7 @@ public class Trips extends ActionBarActivity {
                 @Override
                 protected FilterResults performFiltering(CharSequence constraint) {
                     FilterResults filterResults = new FilterResults();
-                    if (constraint != null || constraint.length() == 0) {
+                    if (constraint != null && constraint.length() != 0) {
                         resultList = autocomplete(constraint.toString());
 
                         filterResults.values = resultList;
@@ -168,7 +177,7 @@ public class Trips extends ActionBarActivity {
                     }
                 });
 
-                HttpRequest request = requestFactory.buildGetRequest(buildURL(s));
+                HttpRequest request = requestFactory.buildGetRequest(buildURLAutoComplete(s));
                 HttpResponse httpResponse = request.execute();
                 PlaceResult directionResult = httpResponse.parseAs(PlaceResult.class);
 
@@ -182,13 +191,12 @@ public class Trips extends ActionBarActivity {
             return resultList;
         }
 
-        private GenericUrl buildURL(String input) {
+        private GenericUrl buildURLAutoComplete(String input) {
             // Build URL.
             GenericUrl url = new GenericUrl(PLACES_API_AUTOCOMPLETION);
             url.put("input", input);
             url.put("key", getResources().getString(R.string.google_browser_key));
             url.put("sensor", false);
-            Log.i("URL", url.toString());
             return url;
         }
     }
@@ -196,6 +204,8 @@ public class Trips extends ActionBarActivity {
     private class DirectionsFetcher extends AsyncTask<String, Integer, String> {
         static final String PARENT_ELEMENT = "step";
         static final String KEY_HTML_INSTRUCTION = "html_instructions";
+        static final String KEY_HTML_DEPARTURE_STOP = "name";
+        static final String KEY_HTML_ARRIVAL_STOP = "arrival_stop";
         private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
 
         public DirectionsFetcher() {
@@ -204,42 +214,21 @@ public class Trips extends ActionBarActivity {
 
         @Override
         protected String doInBackground(String... params) {
-
-            String xml = getXMLFromURL(params[0]);
+            //String xml = getXMLFromURL(params[0]);
 
             /**
-            try {
-                XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-                factory.setNamespaceAware(true);
-                XmlPullParser xpp = factory.newPullParser();
-                xpp.setInput(new StringReader(xml));
-                int eventType = xpp.getEventType();
-                Log.i("HERE", "I AM");
-                while (eventType != XmlPullParser.END_DOCUMENT) {
-                    xpp.require(XmlPullParser.START_TAG, null, "html_instructions");
-                    eventType = xpp.next();
-                }
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-             **/
-
             Document doc = this.getDomElement(xml);
             NodeList nodeList = doc.getElementsByTagName(PARENT_ELEMENT);
-            Log.i("SIZE", "" + nodeList.getLength());
 
             for (int i = 0; i < nodeList.getLength(); i++) {
                 HashMap<String, String> map = new HashMap<String, String>();
                 Element e = (Element) nodeList.item(i);
                 map.put(KEY_HTML_INSTRUCTION, getValue(e, KEY_HTML_INSTRUCTION));
-                Log.i("SIZE", "" + map.get(KEY_HTML_INSTRUCTION));
+                map.put(KEY_HTML_DEPARTURE_STOP, getValue(e, KEY_HTML_DEPARTURE_STOP));
                 arrivals.add(map);
             }
+             **/
 
-            return "SUCCESS";
-            /**
             try {
                 HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
                     @Override
@@ -248,20 +237,21 @@ public class Trips extends ActionBarActivity {
                     }
                 });
 
-                HttpRequest request = requestFactory.buildGetRequest(buildURL("Honolulu,HI", "Aiea,HI"));
+                HttpRequest request = requestFactory.buildGetRequest(buildURLDirections(params[0], params[1]));
                 HttpResponse httpResponse = request.execute();
-                DirectionsResult directionsResult = httpResponse.parseAs(DirectionsResult.class);
-                List<Route> routes = directionsResult.routes;
-                for (Route route : routes) {
-                    List<Legs> legs = route.legs;
-                    for (Legs leg : legs) {
-                        System.out.println(legs.toString());
+                DirectionsResult directions = httpResponse.parseAs(DirectionsResult.class);
+                int steps = directions.routes.get(0).step.get(0).instruction.size();
+                for (int i = 0; i < steps; i++) {
+                    Log.i("INSTRUCTION", directions.routes.get(0).step.get(0).instruction.get(i).instructions);
+                    if (directions.routes.get(0).step.get(0).instruction.get(i).details != null) {
+                        Log.i("DETAIL", directions.routes.get(0).step.get(0).instruction.get(i).details.departure.name);
+                        Log.i("DETAIL", directions.routes.get(0).step.get(0).instruction.get(i).details.arrival.name);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-             **/
+            return "SUCCESS";
         }
 
         protected void onProgressUpdate(Integer... progress) {
@@ -269,7 +259,11 @@ public class Trips extends ActionBarActivity {
         }
 
         protected void onPostExecute(String result) {
-
+            /**
+            for (HashMap<String, String> arrival : arrivals) {
+                Log.i("STEPS", arrival.get(KEY_HTML_INSTRUCTION) + " (" + arrival.get(KEY_HTML_DEPARTURE_STOP) + ")");
+            }
+             **/
         }
 
         public Document getDomElement(String xml) {
@@ -332,13 +326,14 @@ public class Trips extends ActionBarActivity {
 
     }
 
-    private GenericUrl buildURL(String origin, String destination) {
+    private GenericUrl buildURLDirections(String origin, String destination) {
         // Build URL.
         GenericUrl url = new GenericUrl(PLACES_API_DIRECTIONS);
         url.put("origin", origin);
         url.put("destination", destination);
         url.put("sensor", false);
         url.put("mode", "transit");
+        url.put("travel_mode", "bus");
         Log.i("URL_DIRECTIONS", url.toString());
         return url;
     }
@@ -364,21 +359,37 @@ public class Trips extends ActionBarActivity {
 
     public static class Route {
         @Key("legs")
-        public List<Legs> legs;
-    }
-
-    public static class Legs {
-        @Key("steps")
-        public List<Step> steps;
-    }
-
-    public static class Mode {
-        @Key("travel_mode")
-        public String mode;
+        public List<Step> step;
     }
 
     public static class Step {
+        @Key("steps")
+        public List<Instruction> instruction;
+    }
+
+    public static class Instruction {
         @Key("html_instructions")
         public String instructions;
+
+        @Key("transit_details")
+        public Detail details;
+    }
+
+    public static class Detail {
+        @Key("arrival_stop")
+        public Arrival arrival;
+
+        @Key("departure_stop")
+        public Departure departure;
+    }
+
+    public static class Arrival {
+        @Key("name")
+        public String name;
+    }
+
+    public static class Departure {
+        @Key("name")
+        public String name;
     }
 }
