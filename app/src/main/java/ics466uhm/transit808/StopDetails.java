@@ -55,7 +55,7 @@ public class StopDetails extends ListActivity {
     public String prepareURL(String busStopID) {
         String result = getResources().getString(R.string.hea_url).replace("API_key",
                 getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
-        Log.i("URL", result);
+        Log.i("HEA_URL", result);
         return result;
     }
 
