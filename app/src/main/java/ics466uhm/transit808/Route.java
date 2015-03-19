@@ -25,11 +25,12 @@ public class Route extends ActionBarActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         directions = bundle.getParcelableArrayList("directions");
+        for (DirectionStep step : directions) {
+            System.out.println(step);
+        }
         TextView title = (TextView) findViewById(R.id.route_title);
         String origin = intent.getStringExtra(Trips.ORIGIN);
         String destination = intent.getStringExtra(Trips.DESTINATION);
-        Log.i("Origin", origin);
-        Log.i("Destination", destination);
         title.setText("Start: " + origin + "\nEnd: " + destination);
         DirectionStepAdapter directionAdapter = new DirectionStepAdapter(this, directions);
         ListView listView = (ListView) findViewById(R.id.directions);
