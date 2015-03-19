@@ -16,8 +16,8 @@ import java.util.ArrayList;
 public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
     private ArrayList<DirectionStep> directions;
 
-    public DirectionStepAdapter(Context context, int resource, ArrayList<DirectionStep> directions) {
-        super(context, resource, directions);
+    public DirectionStepAdapter(Context context, ArrayList<DirectionStep> directions) {
+        super(context, 0, directions);
         this.directions = directions;
     }
 
@@ -25,7 +25,16 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
         DirectionStep step = directions.get(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.trip_planner, null);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.direction_step, parent, false);
+        }
+
+        TextView instruction = (TextView) convertView.findViewById(R.id.instruction);
+        TextView stops = (TextView) convertView.findViewById(R.id.stops);
+
+        instruction.setText(step.getInstruction());
+        if (!(step.getDepartureStop().isEmpty() && step.arrivalStop.isEmpty())) {
+            stops.setText(step.getDepartureStop() + " to " + step.getArrivalStop());
+            stops.setVisibility(View.VISIBLE);
         }
 
         return convertView;

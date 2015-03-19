@@ -18,7 +18,7 @@
     <string name="title_activity_main">Transit 808</string>
     <string name="title_activity_arrival">ArrivalActivity</string>
     <string name="arrivalHelpText">Enter Street Name/Bus Stop Number</string>
-    <string name="title_activity_bus_stop_search">BusStopSearchActivity</string>
+    <string name="title_activity_bus_stop_search">Bus Stop Search</string>
     <string name="search_hint">Enter Street Name or Bus Stop Number</string>
     <string name="title_activity_stop_details">StopDetails</string>
     <string name="bus_stop_label">Bus Stop:</string>
@@ -30,4 +30,5 @@
     <string name="clear_button">X</string>
     <string name="fill_from">Use Current Location</string>
     <string name="invalid_trip">Could not retrieve valid trip.</string>
+    <string name="title_activity_route">Route</string>
 </resources>

@@ -1,6 +1,7 @@
 package ics466uhm.transit808;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -70,10 +71,14 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
     private List<String> resultList = new ArrayList<String>();
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
-    private static final String PLACES_API_AUTOCOMPLETION = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
-    private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
     private GoogleApiClient mGoogleApiClient;
     private String address = "";
+
+
+    private static final String PLACES_API_AUTOCOMPLETION = "https://maps.googleapis.com/maps/api/place/autocomplete/json?";
+    private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
+    public static final String ORIGIN = "ics466uhm.transit808.ORIGIN";
+    public static final String DESTINATION = "ics466uhm.transit808.DESTINATION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,10 +131,6 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
 
                         this.address = output;
 
-                        //if (address != null) {
-                        //    this.address = address.getAddressLine(0) + ", " + address.getThoroughfare() + ", "
-                        //            + address.getLocality() + ", " + address.getAdminArea();
-                        //}
                     }
                 }
             }
@@ -356,7 +357,16 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
         }
 
         protected void onPostExecute(String result) {
+            EditText from = (EditText) findViewById(R.id.from);
+            EditText to = (EditText) findViewById(R.id.to);
 
+            Intent intent = new Intent(getApplicationContext(), ics466uhm.transit808.Route.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("directions", tripDirections);
+            intent.putExtras(bundle);
+            intent.putExtra(ORIGIN, from.getText().toString());
+            intent.putExtra(DESTINATION, to.getText().toString());
+            startActivity(intent);
         }
 
         public Document getDomElement(String xml) {

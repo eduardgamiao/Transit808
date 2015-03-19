@@ -37,7 +37,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-public class StopDetails extends ListActivity {
+public class StopDetails extends ActionBarActivity {
     private ListAdapter adapter;
     private ListView view;
 
@@ -177,7 +177,8 @@ public class StopDetails extends ListActivity {
             adapter = new SimpleAdapter(StopDetails.this, arrivals, R.layout.stop_item,
                     new String[] {KEY_ROUTE, KEY_HEADSIGN, KEY_STOPTIME},
                     new int[] {R.id.route, R.id.headsign, R.id.arrivalTime});
-            setListAdapter(adapter);
+            ListView list = (ListView) findViewById(R.id.stop_times);
+            list.setAdapter(adapter);
         }
     }
 }
