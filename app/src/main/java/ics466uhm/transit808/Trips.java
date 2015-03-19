@@ -6,6 +6,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -105,30 +106,36 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
 
     private void setCurrentLocation() {
         try {
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-        if (mGoogleApiClient.isConnected()) {
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-                   List<Address> addressList = geocoder.getFromLocation(mLastLocation.getLatitude(),
-                           mLastLocation.getLongitude(), 1);
-                   if (addressList != null || addressList.isEmpty()) {
-                       Address address = addressList.get(0);
-                       ArrayList<String> addressFragments = new ArrayList<String>();
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            if (mGoogleApiClient.isConnected()) {
+                Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                if (mLastLocation != null) {
+                    List<Address> addressList = geocoder.getFromLocation(mLastLocation.getLatitude(),
+                            mLastLocation.getLongitude(), 1);
+                    if (addressList != null || addressList.isEmpty()) {
+                        Address address = addressList.get(0);
+                        String output = "";
+                        for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+                            if (i == 0) {
+                                output = address.getAddressLine(i);
+                            }
+                            else {
+                                output = output.concat(", " + address.getAddressLine(i));
+                            }
+                        }
 
-                       if (address != null) {
-                           this.address = address.getAddressLine(0) + ", " + address.getThoroughfare() + ", "
-                                   + address.getLocality() + ", " + address.getAdminArea();
-                       }
-                   }
-                   else {
-                       Toast.makeText(this, "Could not access your current location.", Toast.LENGTH_LONG);
-                   }
+                        this.address = output;
+
+                        //if (address != null) {
+                        //    this.address = address.getAddressLine(0) + ", " + address.getThoroughfare() + ", "
+                        //            + address.getLocality() + ", " + address.getAdminArea();
+                        //}
+                    }
+                }
             }
-        }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -301,21 +308,6 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
 
         @Override
         protected String doInBackground(String... params) {
-            //String xml = getXMLFromURL(params[0]);
-
-            /**
-            Document doc = this.getDomElement(xml);
-            NodeList nodeList = doc.getElementsByTagName(PARENT_ELEMENT);
-
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                Element e = (Element) nodeList.item(i);
-                map.put(KEY_HTML_INSTRUCTION, getValue(e, KEY_HTML_INSTRUCTION));
-                map.put(KEY_HTML_DEPARTURE_STOP, getValue(e, KEY_HTML_DEPARTURE_STOP));
-                arrivals.add(map);
-            }
-             **/
-
             try {
                 HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
                     @Override
@@ -344,8 +336,12 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
                     }
                 }
                 else {
-                    Looper.prepare();
-                    Toast.makeText(context, getResources().getString(R.string.invalid_trip), Toast.LENGTH_LONG);
+                    Handler handler = new Handler(context.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(context, getResources().getString(R.string.invalid_trip), Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
 
                 Log.i("FULL DIRECTIONS", tripDirections.toString());
@@ -431,6 +427,7 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
         url.put("sensor", false);
         url.put("mode", "transit");
         url.put("travel_mode", "bus");
+        url.put("travel_routing_preference", "fewer_transfers");
         Log.i("URL_DIRECTIONS", url.toString());
         return url;
     }
@@ -447,11 +444,6 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
 
         @Key("id")
         public String id;
-    }
-
-    public static class RouteStatus {
-        @Key("status")
-        public String status;
     }
 
     public static class DirectionsResult {
