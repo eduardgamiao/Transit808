@@ -1,9 +1,9 @@
 package ics466uhm.transit808;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -22,6 +21,8 @@ public class MainActivity extends ActionBarActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
+
+    private static final String SAVED_STOPS = "SAVED_STOPS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mDrawerLayout.closeDrawers();
                 Intent intent = null;
-                switch(position) {
+                switch (position) {
                     case 0:
                         break;
                     case 1:
@@ -61,6 +62,8 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
+
+        populateSavedData();
     }
 
     @Override
@@ -99,7 +102,6 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -112,7 +114,7 @@ public class MainActivity extends ActionBarActivity {
     private void setupDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
 
-            // Called when a drawer has setlled in a completely open state.
+            // Called when a drawer has settled in a completely open state.
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 getSupportActionBar().setTitle(getResources().getString(R.string.nav_title));
@@ -136,5 +138,24 @@ public class MainActivity extends ActionBarActivity {
         String[] osArray = {"Home", "Arrival Times", "Trips"};
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
         mDrawerList.setAdapter(mAdapter);
+    }
+
+    private void populateSavedData() {
+        final ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+
+        String[] stopValues = new String[]{"SINCLAIR CIRCLE Bus Stop #983", "KALIHI TRANSIT CENTER MAKAI Bus Stop #85"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                android.R.id.text1, stopValues);
+
+        stops.setAdapter(adapter);
+
+        stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = (String) stops.getItemAtPosition(position);
+                Log.i("CLICK", item);
+            }
+        });
     }
 }

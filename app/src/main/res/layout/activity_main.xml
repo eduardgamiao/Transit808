@@ -27,10 +27,18 @@
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
 
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/accent_material_dark"
+        android:text="@string/no_stops"
+        android:visibility="gone"/>
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/saved_stop_list"></ListView>
+        android:id="@+id/saved_stops_list"></ListView>
 
     <TextView
         android:id="@+id/saved_trips_label"
@@ -43,6 +51,21 @@
         android:layout_width="fill_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/abc_primary_text_material_light"
+        android:paddingTop="25dp"
+        android:text="@string/no_stops"
+        />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/saved_trips_list"
+        android:visibility="gone"></ListView>
 
 </LinearLayout>
 

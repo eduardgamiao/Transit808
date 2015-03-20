@@ -38,4 +38,5 @@
     <string name="clear_fields">Clear Fields</string>
     <string name="favorite_stops_label">Saved Stops</string>
     <string name="saved_trips">Saved Trips</string>
+    <string name="no_stops">No stops have been saved.</string>
 </resources>

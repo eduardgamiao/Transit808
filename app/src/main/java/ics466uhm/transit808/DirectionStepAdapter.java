@@ -32,14 +32,13 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
         TextView instruction = (TextView) convertView.findViewById(R.id.instruction);
         TextView stops = (TextView) convertView.findViewById(R.id.stops);
 
-        instruction.setText(step.getInstruction());
+        instruction.setText("\u2192 " + step.getInstruction());
         if (!((step.getDepartureStop().equals("") && step.getArrivalStop().equals("")))) {
-            Log.i("IS THIS A BUS STOP?", step.getInstruction());
-            stops.setText(step.getDepartureStop() + " to " + step.getArrivalStop());
+            stops.setText("\t" + step.getDepartureStop() + " to " + step.getArrivalStop());
             stops.setVisibility(TextView.VISIBLE);
         }
         else {
-            stops.setVisibility(TextView.INVISIBLE);
+            stops.setVisibility(TextView.GONE);
         }
 
         return convertView;

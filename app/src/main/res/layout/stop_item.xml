@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/headsign"
+            android:textColor="@color/abc_primary_text_material_light"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:paddingLeft="8dip"/>
 

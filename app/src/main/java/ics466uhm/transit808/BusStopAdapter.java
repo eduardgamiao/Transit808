@@ -29,14 +29,14 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
         BusStop stop = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.activity_bus_stop_search, null);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.stop_list_item, null);
         }
 
         TextView title = (TextView) convertView.findViewById(R.id.stop_street_name);
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
 
         title.setText(stop.getStreetName());
-        stopID.setText(stop.getStopID());
+        stopID.setText("Bus Stop #" + stop.getStopID());
 
         return convertView;
     }

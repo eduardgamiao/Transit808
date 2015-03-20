@@ -54,7 +54,7 @@ public class BusStopSearchActivity extends ActionBarActivity {
 
         // Adding items to list view.
         //adapter = new ArrayAdapter<BusStop>(this, R.layout.list_item, R.id.busStop, stops);
-        adapter = new BusStopAdapter(this, R.layout.list_item, stops);
+        adapter = new BusStopAdapter(this, R.layout.stop_list_item, stops);
         listView.setAdapter(adapter);
 
         editText.addTextChangedListener(new TextWatcher() {
