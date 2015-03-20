@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
+    // Navigation drawer fields.
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -27,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
         addDrawerItems();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -38,20 +40,24 @@ public class MainActivity extends ActionBarActivity {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent;
+                mDrawerLayout.closeDrawers();
+                Intent intent = null;
                 switch(position) {
                     case 0:
                         break;
                     case 1:
                         intent = new Intent(MainActivity.this, BusStopSearchActivity.class);
-                        startActivity(intent);
                         break;
                     case 2:
                         intent = new Intent(MainActivity.this, Trips.class);
-                        startActivity(intent);
                         break;
                     default:
                         break;
+                }
+
+                if (intent != null) {
+                    //intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
                 }
             }
         });
@@ -93,19 +99,23 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
     }
 
+    /**
+     * Navigation drawer setup.
+     */
     private void setupDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
 
             // Called when a drawer has setlled in a completely open state.
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation!");
+                getSupportActionBar().setTitle(getResources().getString(R.string.nav_title));
                 invalidateOptionsMenu();
             }
 
@@ -119,9 +129,12 @@ public class MainActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
+    /**
+     * Populate navigation drawer.
+     */
     private void addDrawerItems() {
         String[] osArray = {"Home", "Arrival Times", "Trips"};
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
         mDrawerList.setAdapter(mAdapter);
-    };
+    }
 }

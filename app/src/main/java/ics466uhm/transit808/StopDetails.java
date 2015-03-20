@@ -3,11 +3,16 @@ package ics466uhm.transit808;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -41,10 +46,54 @@ public class StopDetails extends ActionBarActivity {
     private ListAdapter adapter;
     private ListView view;
 
+    // Navigation drawer fields.
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private String mActivityTitle;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stop_details);
+
+        // Navigation drawer.
+        mDrawerList = (ListView) findViewById(R.id.navList);
+        addDrawerItems();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mActivityTitle = getTitle().toString();
+        setupDrawer();
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mDrawerLayout.closeDrawers();
+                Intent intent = null;
+                switch(position) {
+                    case 0:
+                        intent = new Intent(StopDetails.this, MainActivity.class);
+                        break;
+                    case 1:
+                        intent = new Intent(StopDetails.this, BusStopSearchActivity.class);
+                        break;
+                    case 2:
+                        intent = new Intent(StopDetails.this, Trips.class);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (intent != null) {
+                    //intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                }
+            }
+        });
+
         Intent intent = getIntent();
         TextView title = (TextView) findViewById(R.id.stop_title);
         title.append(intent.getStringExtra(BusStopSearchActivity.STREET_NAME_MESSAGE));
@@ -75,6 +124,10 @@ public class StopDetails extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
@@ -180,5 +233,43 @@ public class StopDetails extends ActionBarActivity {
             ListView list = (ListView) findViewById(R.id.stop_times);
             list.setAdapter(adapter);
         }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    /**
+     * Navigation drawer setup.
+     */
+    private void setupDrawer() {
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+
+            // Called when a drawer has setlled in a completely open state.
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle(getResources().getString(R.string.nav_title));
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    /**
+     * Populate navigation drawer.
+     */
+    private void addDrawerItems() {
+        String[] osArray = {"Home", "Arrival Times", "Trips"};
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
+        mDrawerList.setAdapter(mAdapter);
     }
 }
