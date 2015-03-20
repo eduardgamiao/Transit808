@@ -36,4 +36,6 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="nav_title">Menu</string>
     <string name="clear_fields">Clear Fields</string>
+    <string name="favorite_stops_label">Saved Stops</string>
+    <string name="saved_trips">Saved Trips</string>
 </resources>
