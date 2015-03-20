@@ -1,6 +1,7 @@
 package ics466uhm.transit808;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +33,13 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
         TextView stops = (TextView) convertView.findViewById(R.id.stops);
 
         instruction.setText(step.getInstruction());
-        if (!(step.getDepartureStop().isEmpty() && step.arrivalStop.isEmpty())) {
+        if (!((step.getDepartureStop().equals("") && step.getArrivalStop().equals("")))) {
+            Log.i("IS THIS A BUS STOP?", step.getInstruction());
             stops.setText(step.getDepartureStop() + " to " + step.getArrivalStop());
-            stops.setVisibility(View.VISIBLE);
+            stops.setVisibility(TextView.VISIBLE);
+        }
+        else {
+            stops.setVisibility(TextView.INVISIBLE);
         }
 
         return convertView;

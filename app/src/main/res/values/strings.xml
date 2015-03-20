@@ -31,4 +31,9 @@
     <string name="fill_from">Use Current Location</string>
     <string name="invalid_trip">Could not retrieve valid trip.</string>
     <string name="title_activity_route">Route</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="nav_title">Menu</string>
+    <string name="clear_fields">Clear Fields</string>
 </resources>
