@@ -384,7 +384,12 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
                                     .details.departure.name;
                             String arrival = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.arrival.name;
-                            tripDirections.add(new DirectionStep(instruction, departure, arrival));
+                            String route = directions.routes.get(0).step.get(0).instruction.get(i)
+                                    .details.line.route;
+                            String headsign = directions.routes.get(0).step.get(0).instruction.get(i)
+                                    .details.headsign;
+                                    //tripDirections.add(new DirectionStep(instruction, departure, arrival));
+                            tripDirections.add(new DirectionStep(instruction, departure, arrival, route, headsign));
                         } else {
                             tripDirections.add(new DirectionStep(instruction));
                         }
@@ -580,6 +585,12 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
 
         @Key("departure_stop")
         public Departure departure;
+
+        @Key("headsign")
+        public String headsign;
+
+        @Key("line")
+        public Line line;
     }
 
     public static class Arrival {
@@ -590,5 +601,10 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
     public static class Departure {
         @Key("name")
         public String name;
+    }
+
+    public static class Line {
+        @Key("short_name")
+        public String route;
     }
 }

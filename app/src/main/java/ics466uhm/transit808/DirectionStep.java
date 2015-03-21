@@ -11,6 +11,8 @@ public class DirectionStep implements Parcelable {
     public String instruction;
     public String departureStop = "";
     public String arrivalStop = "";
+    public String route = "";
+    public String headsign = "";
 
     /**
      * Constructor.
@@ -33,6 +35,23 @@ public class DirectionStep implements Parcelable {
     }
 
     /**
+     * Constructor.
+     * @param instruction Direction instruction.
+     * @param departureStop Departure stop.
+     * @param arrivalStop Arrival stop.
+     * @param route Route designation.
+     * @param headsign Route name.
+     */
+    public DirectionStep(String instruction, String departureStop, String arrivalStop, String route,
+                         String headsign) {
+        this.instruction = instruction;
+        this.departureStop = departureStop;
+        this.arrivalStop = arrivalStop;
+        this.route = route;
+        this.headsign = headsign;
+    }
+
+    /**
      * Parcel constructor.
      * @return
      */
@@ -40,6 +59,8 @@ public class DirectionStep implements Parcelable {
         instruction = in.readString();
         departureStop = in.readString();
         arrivalStop = in.readString();
+        route = in.readString();
+        headsign = in.readString();
     }
 
     public String getInstruction() {
@@ -66,6 +87,22 @@ public class DirectionStep implements Parcelable {
         this.arrivalStop = arrivalStop;
     }
 
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
+    }
+
+    public String getHeadsign() {
+        return headsign;
+    }
+
+    public void setHeadsign(String headsign) {
+        this.headsign = headsign;
+    }
+
     public String toString() {
         if (this.arrivalStop.isEmpty() || this.departureStop.isEmpty()) {
             return this.instruction;
@@ -84,6 +121,8 @@ public class DirectionStep implements Parcelable {
         dest.writeString(instruction);
         dest.writeString(departureStop);
         dest.writeString(arrivalStop);
+        dest.writeString(route);
+        dest.writeString(headsign);
     }
 
     public static final Creator<DirectionStep> CREATOR = new Parcelable.Creator<DirectionStep>() {
