@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:alignmentMode="alignBounds"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:useDefaultMargins="true"
+    android:columnCount="1">
+
+    <TextView
+        android:id="@+id/from_label"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/from"
+        android:textColor="?android:textColorSecondary"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/from"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_horizontal"
+        android:drawablePadding="8dp"
+        android:completionThreshold="3"/>
+
+    <TextView
+        android:id="@+id/fillFrom"
+        android:layout_gravity="end"
+        android:onClick="loadCurrentLocation"
+        android:clickable="true"
+        android:text="@string/fill_from"/>
+
+    <TextView
+        android:id="@+id/to_label"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/to"
+        android:textColor="?android:textColorSecondary"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/to"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_horizontal"
+        android:completionThreshold="3"/>
+
+    <Button
+        android:id="@+id/load_directions"
+        android:layout_columnSpan="1"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/load_directions"
+        android:onClick="createTrip"/>
+
+    <Button
+        android:id="@+id/clear_fields"
+        android:layout_columnSpan="1"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/clear_fields"
+        android:onClick="clearFields"/>
+
+</GridLayout>
+
+    <!-- Navigation Drawer UI -->
+    <ListView
+        android:id="@+id/navList"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left|start"
+        android:background="#ffeeeeee"
+        />
+</android.support.v4.widget.DrawerLayout>
+
