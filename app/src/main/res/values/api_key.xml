@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="hea_api">YOUR_HEA_KEY</string>
-    <string name="google_api_key">YOUR_GOOGLE_API_KEY</string>
-    <string name="google_browser_key">YOUR_GOOGLE_BROWSER_KEY</string>
-</resources>
