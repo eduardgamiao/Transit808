@@ -82,8 +82,11 @@ public class BusStopSearchActivity extends ActionBarActivity {
                          Toast.LENGTH_SHORT).show();
                 BusStop stop = (BusStop) parent.getAdapter().getItem(position);
                 Intent intent = new Intent(BusStopSearchActivity.this, StopDetails.class);
-                intent.putExtra(STREET_NAME_MESSAGE, stop.getStreetName());
-                intent.putExtra(BUS_STOP_ID, stop.getStopID());
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("stop", stop);
+                //intent.putExtra(STREET_NAME_MESSAGE, stop.getStreetName());
+                //intent.putExtra(BUS_STOP_ID, stop.getStopID());
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
@@ -207,5 +210,10 @@ public class BusStopSearchActivity extends ActionBarActivity {
         String[] osArray = {"Home", "Arrival Times", "Trips"};
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
         mDrawerList.setAdapter(mAdapter);
+    }
+
+    public void saveStop(View view) {
+        Toast.makeText(getApplicationContext(),
+               "ID: " + view.getId(), Toast.LENGTH_LONG).show();
     }
 }

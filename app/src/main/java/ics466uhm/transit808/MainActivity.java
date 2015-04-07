@@ -13,8 +13,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends ActionBarActivity {
+    public static List<BusStop> savedStops = new ArrayList<BusStop>();
+
     // Navigation drawer fields.
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
@@ -108,6 +113,12 @@ public class MainActivity extends ActionBarActivity {
         mDrawerToggle.syncState();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        populateSavedData();
+    }
+
     /**
      * Navigation drawer setup.
      */
@@ -143,7 +154,15 @@ public class MainActivity extends ActionBarActivity {
     private void populateSavedData() {
         final ListView stops = (ListView) findViewById(R.id.saved_stops_list);
 
-        String[] stopValues = new String[]{"SINCLAIR CIRCLE Bus Stop #983", "KALIHI TRANSIT CENTER MAKAI Bus Stop #85"};
+        DatabaseHandler db = new DatabaseHandler(this);
+
+        List<BusStop> stopList = db.getBusStops();
+
+        String[] stopValues = new String[stopList.size()];
+
+        for (int i = 0; i < stopValues.length; i++) {
+            stopValues[i] = stopList.get(i).getStreetName();
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
                 android.R.id.text1, stopValues);
