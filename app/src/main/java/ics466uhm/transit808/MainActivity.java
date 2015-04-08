@@ -11,10 +11,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
+    public static List<BusStop> savedStops = new ArrayList<BusStop>();
+
     // Navigation drawer fields.
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
@@ -108,6 +116,12 @@ public class MainActivity extends ActionBarActivity {
         mDrawerToggle.syncState();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        populateSavedData();
+    }
+
     /**
      * Navigation drawer setup.
      */
@@ -141,21 +155,33 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void populateSavedData() {
-        final ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+        DatabaseHandler db = new DatabaseHandler(this);
+        ArrayList<BusStop> stopList = db.getBusStops();
+        if (stopList.size() > 0) {
+            BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item, stopList);
+            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+            stops.setVisibility(View.VISIBLE);
+            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
+            emptyText.setVisibility(View.GONE);
+            stops.setAdapter(adapter);
 
-        String[] stopValues = new String[]{"SINCLAIR CIRCLE Bus Stop #983", "KALIHI TRANSIT CENTER MAKAI Bus Stop #85"};
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                android.R.id.text1, stopValues);
-
-        stops.setAdapter(adapter);
-
-        stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = (String) stops.getItemAtPosition(position);
-                Log.i("CLICK", item);
-            }
-        });
+            stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    BusStop stop = (BusStop) parent.getAdapter().getItem(position);
+                    Intent intent = new Intent(MainActivity.this, StopDetails.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("stop", stop);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
+        }
+        else {
+            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
+            emptyText.setVisibility(View.VISIBLE);
+            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+            stops.setVisibility(View.GONE);
+        }
     }
 }

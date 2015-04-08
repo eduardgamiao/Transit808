@@ -13,10 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -52,6 +54,8 @@ public class StopDetails extends ActionBarActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
+    private String stopID;
+    private BusStop stop;
 
 
     @Override
@@ -94,11 +98,23 @@ public class StopDetails extends ActionBarActivity {
             }
         });
 
+        /**
         Intent intent = getIntent();
         TextView title = (TextView) findViewById(R.id.stop_title);
         title.append(intent.getStringExtra(BusStopSearchActivity.STREET_NAME_MESSAGE));
         RetrieveFeed feed = new RetrieveFeed();
         feed.execute(prepareURL(intent.getStringExtra(BusStopSearchActivity.BUS_STOP_ID)));
+        stopID = intent.getStringExtra(BusStopSearchActivity.BUS_STOP_ID);
+        **/
+        Bundle bundle = this.getIntent().getExtras();
+        if (bundle != null) {
+            stop = bundle.getParcelable("stop");
+            TextView title = (TextView) findViewById(R.id.stop_title);
+            title.append(stop.getStreetName());
+            RetrieveFeed feed = new RetrieveFeed();
+            feed.execute(prepareURL(stop.getStopID()));
+            changeButtonState();
+        }
     }
 
     public String prepareURL(String busStopID) {
@@ -262,6 +278,35 @@ public class StopDetails extends ActionBarActivity {
         };
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    public void saveStop(View view) {
+        DatabaseHandler db = new DatabaseHandler(this);
+        db.addStop(stop);
+        changeButtonState();
+    }
+
+    public void removeStop(View view) {
+        DatabaseHandler db = new DatabaseHandler(this);
+        db.deleteStop(Integer.parseInt(stop.getStopID()));
+        changeButtonState();
+    }
+
+    private void changeButtonState() {
+        DatabaseHandler db = new DatabaseHandler(this);
+        if (db.getStop(Integer.parseInt(stop.getStopID())) == null) {
+            Button oldButton = (Button) findViewById(R.id.removeStop);
+            oldButton.setVisibility(View.GONE);
+            Button newButton = (Button) findViewById(R.id.addStop);
+            newButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            Button oldButton = (Button) findViewById(R.id.removeStop);
+            oldButton.setVisibility(View.VISIBLE);
+            Button newButton = (Button) findViewById(R.id.addStop);
+            newButton.setVisibility(View.GONE);
+        }
+
     }
 
     /**

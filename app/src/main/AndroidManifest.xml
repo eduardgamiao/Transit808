@@ -13,7 +13,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,23 +23,23 @@
         <activity
             android:name=".BusStopSearchActivity"
             android:label="@string/title_activity_bus_stop_search"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
             android:name=".StopDetails"
             android:label="@string/title_activity_stop_details"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".Trips"
             android:label="@string/title_activity_trips"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".Route"
             android:label="@string/title_activity_route"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTask">
         </activity>
     </application>
 

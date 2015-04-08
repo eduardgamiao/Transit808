@@ -40,4 +40,7 @@
     <string name="saved_trips">Saved Trips</string>
     <string name="no_stops">No stops have been saved.</string>
     <string name="right_arrow">→</string>
+    <string name="arrival_text">Arriving Time: </string>
+    <string name="stop_add_button">Remember This Stop</string>
+    <string name="stop_remove_button">Forget This Stop</string>
 </resources>
