@@ -30,9 +30,11 @@
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:id="@+id/saved_stops_empty"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/accent_material_dark"
+        android:textColor="@color/abc_primary_text_material_light"
         android:text="@string/no_stops"
+        android:paddingTop="25dp"
         android:visibility="gone"/>
 
     <ListView
@@ -45,7 +47,8 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/saved_trips"/>
+        android:text="@string/saved_trips"
+        android:paddingTop="25dp"/>
 
     <View
         android:layout_width="fill_parent"

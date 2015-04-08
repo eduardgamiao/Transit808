@@ -11,7 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,29 +155,33 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void populateSavedData() {
-        final ListView stops = (ListView) findViewById(R.id.saved_stops_list);
-
         DatabaseHandler db = new DatabaseHandler(this);
+        ArrayList<BusStop> stopList = db.getBusStops();
+        if (stopList.size() > 0) {
+            BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item, stopList);
+            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+            stops.setVisibility(View.VISIBLE);
+            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
+            emptyText.setVisibility(View.GONE);
+            stops.setAdapter(adapter);
 
-        List<BusStop> stopList = db.getBusStops();
-
-        String[] stopValues = new String[stopList.size()];
-
-        for (int i = 0; i < stopValues.length; i++) {
-            stopValues[i] = stopList.get(i).getStreetName();
+            stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    BusStop stop = (BusStop) parent.getAdapter().getItem(position);
+                    Intent intent = new Intent(MainActivity.this, StopDetails.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("stop", stop);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
         }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                android.R.id.text1, stopValues);
-
-        stops.setAdapter(adapter);
-
-        stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = (String) stops.getItemAtPosition(position);
-                Log.i("CLICK", item);
-            }
-        });
+        else {
+            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
+            emptyText.setVisibility(View.VISIBLE);
+            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+            stops.setVisibility(View.GONE);
+        }
     }
 }

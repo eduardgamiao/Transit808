@@ -37,11 +37,6 @@ public class BusStopSearchActivity extends ActionBarActivity {
     BusStopAdapter adapter;
     EditText editText;
 
-    // Variables for sending to details activity.
-    public final static String STREET_NAME_MESSAGE = "ics466uhm.transit808.STREET";
-    public final static String BUS_STOP_ID = "ics466uhm.transit808.STOP_ID";
-    public final static String STOP_COORDINATES = "ics466uhm.transit808.COORDINATES";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,8 +79,6 @@ public class BusStopSearchActivity extends ActionBarActivity {
                 Intent intent = new Intent(BusStopSearchActivity.this, StopDetails.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("stop", stop);
-                //intent.putExtra(STREET_NAME_MESSAGE, stop.getStreetName());
-                //intent.putExtra(BUS_STOP_ID, stop.getStopID());
                 intent.putExtras(bundle);
                 startActivity(intent);
             }

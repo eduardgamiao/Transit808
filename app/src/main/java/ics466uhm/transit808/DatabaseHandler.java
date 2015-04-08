@@ -108,8 +108,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * Retrieve all stops in database.
      * @return A list of all stops.
      */
-    public List<BusStop> getBusStops() {
-        List<BusStop> stops = new ArrayList<BusStop>();
+    public ArrayList<BusStop> getBusStops() {
+        ArrayList<BusStop> stops = new ArrayList<BusStop>();
 
         String selectQuery = "SELECT * FROM " + STOP_TABLE;
 
