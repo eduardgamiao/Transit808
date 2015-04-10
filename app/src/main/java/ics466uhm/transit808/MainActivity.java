@@ -5,16 +5,13 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +55,7 @@ public class MainActivity extends ActionBarActivity {
                         intent = new Intent(MainActivity.this, BusStopSearchActivity.class);
                         break;
                     case 2:
-                        intent = new Intent(MainActivity.this, Trips.class);
+                        intent = new Intent(MainActivity.this, TripPlanner.class);
                         break;
                     default:
                         break;
@@ -106,7 +103,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void switchToTrips(View view) {
-        Intent intent = new Intent(this, Trips.class);
+        Intent intent = new Intent(this, TripPlanner.class);
         startActivity(intent);
     }
 

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -105,7 +103,7 @@ public class BusStopSearchActivity extends ActionBarActivity {
                     case 1:
                         break;
                     case 2:
-                        intent = new Intent(BusStopSearchActivity.this, Trips.class);
+                        intent = new Intent(BusStopSearchActivity.this, TripPlanner.class);
                         break;
                     default:
                         break;
