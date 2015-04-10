@@ -303,7 +303,6 @@ public class StopDetails extends ActionBarActivity {
             Button newButton = (Button) findViewById(R.id.addStop);
             newButton.setVisibility(View.GONE);
         }
-
     }
 
     /**

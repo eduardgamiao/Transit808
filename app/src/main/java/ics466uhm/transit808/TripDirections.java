@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -60,8 +61,11 @@ public class TripDirections extends ActionBarActivity {
         Bundle bundle = intent.getExtras();
         trip = bundle.getParcelable("trip");
         createTrip(trip);
-        TextView title = (TextView) findViewById(R.id.route_title);
-        title.setText("From: " + trip.getOrigin() + "\nEnd: " + trip.getDestination());
+        TextView origin = (TextView) findViewById(R.id.origin);
+        TextView destination = (TextView) findViewById(R.id.destination);
+        origin.setText(trip.getOrigin());
+        destination.setText(trip.getDestination());
+        changeButtonState();
 
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
@@ -256,6 +260,34 @@ public class TripDirections extends ActionBarActivity {
         url.put("travel_routing_preference", "fewer_transfers");
         Log.i("URL_DIRECTIONS", url.toString());
         return url;
+    }
+
+    public void saveTrip(View view) {
+        DatabaseHandler db = new DatabaseHandler(this);
+        db.addTrip(trip);
+        changeButtonState();
+    }
+
+    public void removeTrip(View view) {
+        DatabaseHandler db = new DatabaseHandler(this);
+        db.deleteTrip(trip.getOrigin() + "|" + trip.getDestination());
+        changeButtonState();
+    }
+
+    private void changeButtonState() {
+        DatabaseHandler db = new DatabaseHandler(this);
+        if (db.getTrip(trip.getOrigin(), trip.getDestination()) == null) {
+            Button oldButton = (Button) findViewById(R.id.removeTrip);
+            oldButton.setVisibility(View.GONE);
+            Button newButton = (Button) findViewById(R.id.addTrip);
+            newButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            Button oldButton = (Button) findViewById(R.id.removeTrip);
+            oldButton.setVisibility(View.VISIBLE);
+            Button newButton = (Button) findViewById(R.id.addTrip);
+            newButton.setVisibility(View.GONE);
+        }
     }
 
     public static class DirectionsResult {

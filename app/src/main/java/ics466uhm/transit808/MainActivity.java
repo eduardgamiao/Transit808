@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,6 +156,7 @@ public class MainActivity extends ActionBarActivity {
     private void populateSavedData() {
         DatabaseHandler db = new DatabaseHandler(this);
         ArrayList<BusStop> stopList = db.getBusStops();
+        ArrayList<Trip> tripList = db.getTrips();
         if (stopList.size() > 0) {
             BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item, stopList);
             ListView stops = (ListView) findViewById(R.id.saved_stops_list);
@@ -179,6 +182,32 @@ public class MainActivity extends ActionBarActivity {
             emptyText.setVisibility(View.VISIBLE);
             ListView stops = (ListView) findViewById(R.id.saved_stops_list);
             stops.setVisibility(View.GONE);
+        }
+        if (tripList.isEmpty()) {
+            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
+            emptyText.setVisibility(View.VISIBLE);
+            ListView stops = (ListView) findViewById(R.id.saved_trips_list);
+            stops.setVisibility(View.GONE);
+        }
+        else {
+            TripAdapter adapter = new TripAdapter(this, R.layout.trips, tripList);
+            ListView trips = (ListView) findViewById(R.id.saved_trips_list);
+            trips.setVisibility(View.VISIBLE);
+            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
+            emptyText.setVisibility(View.GONE);
+            trips.setAdapter(adapter);
+
+            trips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Trip trip = (Trip) parent.getAdapter().getItem(position);
+                    Intent intent = new Intent(MainActivity.this, TripDirections.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("trip", trip);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
         }
     }
 }

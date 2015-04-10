@@ -25,12 +25,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Table names.
     private static final String STOP_TABLE = "stops";
-    private static final String TRIPS_TABLE = "trips";
+    private static final String TRIP_TABLE = "trips";
 
     // Column names.
     private static final String STOPS_ID = "id";
     private static final String STOPS_STREET = "street_name";
     private static final String STOPS_COORDINATES = "coordinates";
+
+    private static final String TRIP_ID = "id";
+    private static final String TRIP_ORIGIN = "origin";
+    private static final String TRIP_DESTINATION = "destination";
+    private static final String TRIP_TITLE = "title";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -45,7 +50,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_STOPS_TABLE = "CREATE TABLE " + STOP_TABLE + "("
                 + STOPS_ID + " INTEGER PRIMARY KEY," + STOPS_STREET + " TEXT,"
                 + STOPS_COORDINATES + " TEXT" + ")";
+        String CREATE_TRIP_TABLE = "CREATE TABLE " + TRIP_TABLE + "(" + TRIP_ID + " STRING PRIMARY KEY,"
+                + TRIP_ORIGIN + " TEXT NOT NULL," + TRIP_DESTINATION + " TEXT NOT NULL,"
+                + TRIP_TITLE + " TEXT" + ")";
         db.execSQL(CREATE_STOPS_TABLE);
+        db.execSQL(CREATE_TRIP_TABLE);
     }
 
     /**
@@ -58,6 +67,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop old tables.
         db.execSQL("DROP TABLE IF EXISTS " + STOP_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TRIP_TABLE);
 
         // Recreate tables.
         onCreate(db);
@@ -94,7 +104,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()) {
             stop = new BusStop(cursor.getString(2), cursor.getString(1), cursor.getString(0));
         }
-
+        db.close();
         return stop;
     }
 
@@ -127,7 +137,75 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 stops.add(stop);
             } while (cursor.moveToNext());
         }
-
+        db.close();
         return stops;
+    }
+
+    /**
+     * Add trip to database.
+     * @param trip The trip to add.
+     */
+    public void addTrip(Trip trip) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(TRIP_ID, trip.getOrigin() + "|" + trip.getDestination());
+        values.put(TRIP_ORIGIN, trip.getOrigin());
+        values.put(TRIP_DESTINATION, trip.getDestination());
+        values.put(TRIP_TITLE, trip.getTitle());
+
+        db.insert(TRIP_TABLE, null, values);
+        db.close();
+    }
+
+    /**
+     * Get a trip.
+     * @return The trip matching the id.
+     */
+    public Trip getTrip(String origin, String destination) {
+        Trip trip = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT *  FROM " + TRIP_TABLE + " WHERE " + TRIP_ORIGIN + " = \"" + origin + "\" AND " +
+                TRIP_DESTINATION + " = \"" + destination + "\";", null);
+        if (cursor != null && cursor.moveToFirst()) {
+            trip = new Trip(cursor.getString(1), cursor.getString(2), cursor.getString(3));
+        }
+        db.close();
+        return trip;
+    }
+
+    public void deleteTrip(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TRIP_TABLE, TRIP_ID + " = ? ", new String[] {id});
+        db.close();
+    }
+
+    /**
+     * Retrieve all trips in database.
+     * @return A list of all trips.
+     */
+    public ArrayList<Trip> getTrips() {
+        ArrayList<Trip> trips = new ArrayList<Trip>();
+
+        String selectQuery = "SELECT * FROM " + TRIP_TABLE;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Trip trip = new Trip();
+
+                trip.setOrigin(cursor.getString(1));
+                trip.setDestination(cursor.getString(2));
+                trip.setTitle(cursor.getString(3));
+
+                trips.add(trip);
+            } while (cursor.moveToNext());
+        }
+        db.close();
+
+        return trips;
     }
 }

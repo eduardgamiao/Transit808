@@ -6,7 +6,7 @@
     android:layout_width="match_parent">
 
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -16,10 +16,48 @@
     tools:context="ics466uhm.transit808.TripDirections">
 
     <TextView
-        android:id="@+id/route_title"
+        android:id="@+id/from_label"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/from"
+        android:textColor="?android:textColorSecondary"/>
+
+    <TextView
+        android:id="@+id/origin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
+        android:id="@+id/to_label"
+        android:layout_gravity="fill_horizontal"
+        android:text="@string/to"
+        android:textColor="?android:textColorSecondary"/>
+
+    <TextView
+        android:id="@+id/destination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addTrip"
+        android:drawableLeft="@android:drawable/btn_star_big_on"
+        android:text="@string/stop_add_button"
+        android:visibility="visible"
+        android:onClick="saveTrip"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/removeTrip"
+        android:drawableLeft="@android:drawable/btn_star_big_off"
+        android:text="@string/stop_remove_button"
+        android:visibility="gone"
+        android:onClick="removeTrip"
+        />
 
     <View
         android:layout_width="fill_parent"
@@ -31,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-</LinearLayout>
+</GridLayout>
 
     <!-- Navigation Drawer UI -->
 <ListView
