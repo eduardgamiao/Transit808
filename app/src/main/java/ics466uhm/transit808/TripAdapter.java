@@ -31,8 +31,8 @@ public class TripAdapter extends ArrayAdapter<Trip> {
         TextView destination = (TextView) convertView.findViewById(R.id.destination_title);
 
         if (trip != null) {
-            origin.setText(trip.getOrigin());
-            destination.setText(trip.getDestination());
+            origin.setText(trip.getOriginShort());
+            destination.setText(trip.getDestinationShort());
         }
 
         return convertView;

@@ -37,7 +37,7 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
 
         title.setText(stop.getStreetName());
-        stopID.setText("Bus Stop #" + stop.getStopID());
+        stopID.setText(stop.getStopID());
 
         return convertView;
     }

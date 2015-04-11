@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/addTrip"
         android:drawableLeft="@android:drawable/btn_star_big_on"
-        android:text="@string/stop_add_button"
+        android:text="@string/trip_add_button"
         android:visibility="visible"
         android:onClick="saveTrip"
         />
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/removeTrip"
         android:drawableLeft="@android:drawable/btn_star_big_off"
-        android:text="@string/stop_remove_button"
+        android:text="@string/trip_remove_button"
         android:visibility="gone"
         android:onClick="removeTrip"
         />

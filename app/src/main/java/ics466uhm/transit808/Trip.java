@@ -52,6 +52,22 @@ public class Trip implements Parcelable {
         this.title = title;
     }
 
+    public String getOriginShort() {
+        String [] originSplit = origin.split(", ");
+        if (originSplit.length > 0) {
+            return originSplit[0];
+        }
+        return origin;
+    }
+
+    public String getDestinationShort() {
+        String [] destinationSplit = destination.split(", ");
+        if (destinationSplit.length > 0) {
+            return destinationSplit[0];
+        }
+        return destination;
+    }
+
     @Override
     public int describeContents() {
         return 0;
