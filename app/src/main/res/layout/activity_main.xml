@@ -61,7 +61,8 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/abc_primary_text_material_light"
         android:paddingTop="25dp"
-        android:text="@string/no_stops"
+        android:id="@+id/saved_trips_empty"
+        android:text="@string/no_trips"
         />
 
     <ListView

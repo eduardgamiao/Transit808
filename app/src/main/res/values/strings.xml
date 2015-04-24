@@ -23,7 +23,7 @@
     <string name="title_activity_stop_details">StopDetails</string>
     <string name="bus_stop_label">Bus Stop:</string>
     <string name="from">From</string>
-    <string name="to">To</string>
+    <string name="to"> To </string>
     <string name="title_activity_trips">Trips</string>
     <string name="load_directions">Create Trip</string>
     <string name="title_activity_maps">Map</string>
@@ -38,9 +38,13 @@
     <string name="clear_fields">Clear Fields</string>
     <string name="favorite_stops_label">Saved Stops</string>
     <string name="saved_trips">Saved Trips</string>
-    <string name="no_stops">No stops have been saved.</string>
+    <string name="no_stops">No stops saved.</string>
     <string name="right_arrow">→</string>
     <string name="arrival_text">Arriving Time: </string>
     <string name="stop_add_button">Remember This Stop</string>
     <string name="stop_remove_button">Forget This Stop</string>
+    <string name="no_trips">No trips saved.</string>
+    <string name="trip_add_button">Remember This Trip</string>
+    <string name="trip_remove_button">Remove This Trip</string>
+    <string name="bus_stop_number_label">Bus Stop # </string>
 </resources>

@@ -1,6 +1,5 @@
 package ics466uhm.transit808;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
@@ -18,7 +17,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,7 +33,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -85,7 +82,7 @@ public class StopDetails extends ActionBarActivity {
                         intent = new Intent(StopDetails.this, BusStopSearchActivity.class);
                         break;
                     case 2:
-                        intent = new Intent(StopDetails.this, Trips.class);
+                        intent = new Intent(StopDetails.this, TripPlanner.class);
                         break;
                     default:
                         break;
@@ -306,7 +303,6 @@ public class StopDetails extends ActionBarActivity {
             Button newButton = (Button) findViewById(R.id.addStop);
             newButton.setVisibility(View.GONE);
         }
-
     }
 
     /**

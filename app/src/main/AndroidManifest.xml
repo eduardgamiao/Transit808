@@ -32,12 +32,12 @@
             android:launchMode="singleTask">
         </activity>
         <activity
-            android:name=".Trips"
+            android:name=".TripPlanner"
             android:label="@string/title_activity_trips"
             android:launchMode="singleTask">
         </activity>
         <activity
-            android:name=".Route"
+            android:name=".TripDirections"
             android:label="@string/title_activity_route"
             android:launchMode="singleTask">
         </activity>

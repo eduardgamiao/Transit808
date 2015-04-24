@@ -8,7 +8,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -59,12 +58,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-
-public class Trips extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
+public class TripPlanner extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     private AutoCompleteTextView from;
     private AutoCompleteTextView to;
@@ -120,10 +115,10 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
                 Intent intent = null;
                 switch(position) {
                     case 0:
-                        intent = new Intent(Trips.this, MainActivity.class);
+                        intent = new Intent(TripPlanner.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(Trips.this, BusStopSearchActivity.class);
+                        intent = new Intent(TripPlanner.this, BusStopSearchActivity.class);
                         break;
                     case 2:
                         break;
@@ -205,20 +200,6 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void createTrip(View view) {
-        EditText from = (EditText) findViewById(R.id.from);
-        EditText to = (EditText) findViewById(R.id.to);
-
-        Log.i("Create", from.getText() + " -> " + to.getText());
-
-        DirectionsFetcher df = new DirectionsFetcher(this);
-
-        String fromText = from.getText().toString();
-        String toText = to.getText().toString();
-
-        df.execute(fromText, toText);
     }
 
     public void clearFields(View view) {
@@ -352,153 +333,15 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
         }
     }
 
-    private class DirectionsFetcher extends AsyncTask<String, Integer, String> {
-        private ArrayList<DirectionStep> tripDirections = new ArrayList<>();
-        private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
-        private Context context;
+    public void createTrip(View view) {
+        EditText from = (EditText) findViewById(R.id.from);
+        EditText to = (EditText) findViewById(R.id.to);
 
-        public DirectionsFetcher(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
-                    @Override
-                    public void initialize(HttpRequest httpRequest) throws IOException {
-                        httpRequest.setParser(new JsonObjectParser(JSON_FACTORY));
-                    }
-                });
-
-                HttpRequest request = requestFactory.buildGetRequest(buildURLDirections(params[0], params[1]));
-                HttpResponse httpResponse = request.execute();
-                DirectionsResult directions = httpResponse.parseAs(DirectionsResult.class);
-                if (directions.status.equals("OK")) {
-                    int steps = directions.routes.get(0).step.get(0).instruction.size();
-                    for (int i = 0; i < steps; i++) {
-                        String instruction = directions.routes.get(0).step.get(0).instruction.get(i)
-                                .instructions;
-                        if (directions.routes.get(0).step.get(0).instruction.get(i).details != null) {
-                            String departure = directions.routes.get(0).step.get(0).instruction.get(i)
-                                    .details.departure.name;
-                            String arrival = directions.routes.get(0).step.get(0).instruction.get(i)
-                                    .details.arrival.name;
-                            String route = directions.routes.get(0).step.get(0).instruction.get(i)
-                                    .details.line.route;
-                            String headsign = directions.routes.get(0).step.get(0).instruction.get(i)
-                                    .details.headsign;
-                                    //tripDirections.add(new DirectionStep(instruction, departure, arrival));
-                            tripDirections.add(new DirectionStep(instruction, departure, arrival, route, headsign));
-                        } else {
-                            tripDirections.add(new DirectionStep(instruction));
-                        }
-                    }
-                }
-                else {
-                    Handler handler = new Handler(context.getMainLooper());
-                    handler.post(new Runnable() {
-                        public void run() {
-                            Toast.makeText(context, getResources().getString(R.string.invalid_trip), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-
-                Log.i("FULL DIRECTIONS", tripDirections.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return "SUCCESS";
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-
-        }
-
-        protected void onPostExecute(String result) {
-            EditText from = (EditText) findViewById(R.id.from);
-            EditText to = (EditText) findViewById(R.id.to);
-
-            Intent intent = new Intent(getApplicationContext(), ics466uhm.transit808.Route.class);
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("directions", tripDirections);
-            intent.putExtras(bundle);
-            intent.putExtra(ORIGIN, from.getText().toString());
-            intent.putExtra(DESTINATION, to.getText().toString());
-            startActivity(intent);
-        }
-
-        public Document getDomElement(String xml) {
-            Document doc = null;
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
-            try {
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                InputSource is = new InputSource();
-                is.setCharacterStream(new StringReader(xml));
-                doc = db.parse(is);
-
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return doc;
-        }
-
-        public String getXMLFromURL(String url) {
-            String xml = url;
-
-            try {
-                DefaultHttpClient httpClient = new DefaultHttpClient();
-                HttpPost httpPost = new HttpPost(url);
-
-                org.apache.http.HttpResponse httpResponse = httpClient.execute(httpPost);
-                HttpEntity httpEntity = httpResponse.getEntity();
-                xml = EntityUtils.toString(httpEntity);
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return xml;
-        }
-
-        public String getValue(Element item, String str) {
-            NodeList nodeList = item.getElementsByTagName(str);
-            return this.getElementValue(nodeList.item(0));
-        }
-
-        public final String getElementValue(Node element) {
-            Node child;
-            if (element != null) {
-                if (element.hasChildNodes()) {
-                    for (child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
-                        if(child.getNodeType() == Node.TEXT_NODE) {
-                            return child.getNodeValue();
-                        }
-                    }
-                }
-            }
-            return "";
-        }
-
-    }
-
-    private GenericUrl buildURLDirections(String origin, String destination) {
-        // Build URL.
-        GenericUrl url = new GenericUrl(PLACES_API_DIRECTIONS);
-        url.put("origin", origin);
-        url.put("destination", destination);
-        url.put("sensor", false);
-        url.put("mode", "transit");
-        url.put("travel_mode", "bus");
-        url.put("travel_routing_preference", "fewer_transfers");
-        Log.i("URL_DIRECTIONS", url.toString());
-        return url;
+        Intent intent = new Intent(TripPlanner.this, TripDirections.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("trip", new Trip(from.getText().toString(), to.getText().toString(), ""));
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @Override
@@ -551,60 +394,5 @@ public class Trips extends ActionBarActivity implements GoogleApiClient.Connecti
 
         @Key("id")
         public String id;
-    }
-
-    public static class DirectionsResult {
-        @Key("routes")
-        public List<Route> routes;
-
-        @Key("status")
-        public String status;
-    }
-
-    public static class Route {
-        @Key("legs")
-        public List<Step> step;
-    }
-
-    public static class Step {
-        @Key("steps")
-        public List<Instruction> instruction;
-    }
-
-    public static class Instruction {
-        @Key("html_instructions")
-        public String instructions;
-
-        @Key("transit_details")
-        public Detail details;
-    }
-
-    public static class Detail {
-        @Key("arrival_stop")
-        public Arrival arrival;
-
-        @Key("departure_stop")
-        public Departure departure;
-
-        @Key("headsign")
-        public String headsign;
-
-        @Key("line")
-        public Line line;
-    }
-
-    public static class Arrival {
-        @Key("name")
-        public String name;
-    }
-
-    public static class Departure {
-        @Key("name")
-        public String name;
-    }
-
-    public static class Line {
-        @Key("short_name")
-        public String route;
     }
 }
