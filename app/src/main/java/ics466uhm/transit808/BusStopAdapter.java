@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
 
         title.setText(stop.getStreetName());
-        stopID.setText("Bus Stop #" + stop.getStopID());
+        stopID.setText(stop.getStopID());
 
         return convertView;
     }

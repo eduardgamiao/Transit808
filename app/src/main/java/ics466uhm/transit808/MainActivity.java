@@ -12,9 +12,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
+    public static List<BusStop> savedStops = new ArrayList<BusStop>();
+
     // Navigation drawer fields.
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
@@ -50,7 +57,7 @@ public class MainActivity extends ActionBarActivity {
                         intent = new Intent(MainActivity.this, BusStopSearchActivity.class);
                         break;
                     case 2:
-                        intent = new Intent(MainActivity.this, Trips.class);
+                        intent = new Intent(MainActivity.this, TripPlanner.class);
                         break;
                     default:
                         break;
@@ -98,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void switchToTrips(View view) {
-        Intent intent = new Intent(this, Trips.class);
+        Intent intent = new Intent(this, TripPlanner.class);
         startActivity(intent);
     }
 
@@ -106,6 +113,12 @@ public class MainActivity extends ActionBarActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        populateSavedData();
     }
 
     /**
@@ -141,21 +154,60 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void populateSavedData() {
-        final ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+        DatabaseHandler db = new DatabaseHandler(this);
+        ArrayList<BusStop> stopList = db.getBusStops();
+        ArrayList<Trip> tripList = db.getTrips();
+        if (stopList.size() > 0) {
+            BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item, stopList);
+            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+            stops.setVisibility(View.VISIBLE);
+            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
+            emptyText.setVisibility(View.GONE);
+            stops.setAdapter(adapter);
 
-        String[] stopValues = new String[]{"SINCLAIR CIRCLE Bus Stop #983", "KALIHI TRANSIT CENTER MAKAI Bus Stop #85"};
+            stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    BusStop stop = (BusStop) parent.getAdapter().getItem(position);
+                    Intent intent = new Intent(MainActivity.this, StopDetails.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("stop", stop);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
+        }
+        else {
+            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
+            emptyText.setVisibility(View.VISIBLE);
+            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
+            stops.setVisibility(View.GONE);
+        }
+        if (tripList.isEmpty()) {
+            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
+            emptyText.setVisibility(View.VISIBLE);
+            ListView stops = (ListView) findViewById(R.id.saved_trips_list);
+            stops.setVisibility(View.GONE);
+        }
+        else {
+            TripAdapter adapter = new TripAdapter(this, R.layout.trips, tripList);
+            ListView trips = (ListView) findViewById(R.id.saved_trips_list);
+            trips.setVisibility(View.VISIBLE);
+            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
+            emptyText.setVisibility(View.GONE);
+            trips.setAdapter(adapter);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                android.R.id.text1, stopValues);
-
-        stops.setAdapter(adapter);
-
-        stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = (String) stops.getItemAtPosition(position);
-                Log.i("CLICK", item);
-            }
-        });
+            trips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Trip trip = (Trip) parent.getAdapter().getItem(position);
+                    Intent intent = new Intent(MainActivity.this, TripDirections.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("trip", trip);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }

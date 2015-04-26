@@ -21,6 +21,26 @@
         android:text="Arrival Times for "
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addStop"
+        android:drawableLeft="@android:drawable/btn_star_big_on"
+        android:text="@string/stop_add_button"
+        android:visibility="visible"
+        android:onClick="saveStop"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/removeStop"
+        android:drawableLeft="@android:drawable/btn_star_big_off"
+        android:text="@string/stop_remove_button"
+        android:visibility="gone"
+        android:onClick="removeStop"
+        />
+
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
