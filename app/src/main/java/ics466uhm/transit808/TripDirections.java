@@ -2,6 +2,7 @@ package ics466uhm.transit808;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
@@ -20,9 +21,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -52,6 +56,7 @@ public class TripDirections extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
     private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
+    private LatLng startingCoordinates;
     private GoogleMap googleMap;
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
@@ -69,12 +74,6 @@ public class TripDirections extends ActionBarActivity {
         TextView destination = (TextView) findViewById(R.id.destination);
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
-        try {
-            initializeMap();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
         changeButtonState();
 
         // Navigation drawer.
@@ -122,12 +121,6 @@ public class TripDirections extends ActionBarActivity {
         TextView destination = (TextView) findViewById(R.id.destination);
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
-        try {
-            initializeMap();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
         changeButtonState();
     }
 
@@ -222,8 +215,10 @@ public class TripDirections extends ActionBarActivity {
                         String instruction = directions.routes.get(0).step.get(0).instruction.get(i)
                                 .instructions;
                         String travelMode = directions.routes.get(0).step.get(0).instruction.get(i).travelMode;
+                        startingCoordinates = new LatLng(directions.routes.get(0).step.get(0).startLocation.lat,
+                                directions.routes.get(0).step.get(0).startLocation.lng);
                         String overviewPolyline = directions.routes.get(0).polyline.overviewPolyline;
-                        Log.i("Start_End", directions.routes.get(0).step.get(0).startLocation.lat + "|" + directions.routes.get(0).step.get(0).startLocation.lng);
+                        Log.i("COORDINATES", startingCoordinates.latitude + "|" + startingCoordinates.longitude);
                         if (travelMode != null && travelMode.equals("TRANSIT")) {
                             String departure = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.departure.name;
@@ -263,6 +258,12 @@ public class TripDirections extends ActionBarActivity {
             DirectionStepAdapter directionAdapter = new DirectionStepAdapter(TripDirections.this, tripDirections);
             ListView listView = (ListView) findViewById(R.id.directions);
             listView.setAdapter(directionAdapter);
+            try {
+                initializeMap();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public ArrayList<DirectionStep> getDirections() {
@@ -329,6 +330,9 @@ public class TripDirections extends ActionBarActivity {
                 Toast.makeText(getApplicationContext(), "Error creating map. Please try again later.",
                         Toast.LENGTH_SHORT).show();
             }
+            else {
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingCoordinates, 15));
+            }
         }
     }
 
@@ -363,10 +367,10 @@ public class TripDirections extends ActionBarActivity {
 
     public static class StartLocation {
         @Key("lat")
-        public long lat;
+        public double lat;
 
         @Key("lng")
-        public long lng;
+        public double lng;
     }
 
     public static class Instruction {

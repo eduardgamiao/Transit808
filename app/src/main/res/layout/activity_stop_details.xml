@@ -19,8 +19,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textBackground="@color/black"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <Button
         android:layout_width="wrap_content"
