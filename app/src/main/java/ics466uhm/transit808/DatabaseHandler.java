@@ -36,6 +36,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TRIP_ORIGIN = "origin";
     private static final String TRIP_DESTINATION = "destination";
     private static final String TRIP_TITLE = "title";
+    private static final String TRIP_START_COORDINATES = "start_coordinates";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

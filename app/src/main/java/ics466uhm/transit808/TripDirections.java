@@ -20,6 +20,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -49,6 +52,7 @@ public class TripDirections extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
     private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
+    private GoogleMap googleMap;
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -65,6 +69,12 @@ public class TripDirections extends ActionBarActivity {
         TextView destination = (TextView) findViewById(R.id.destination);
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
+        try {
+            initializeMap();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         changeButtonState();
 
         // Navigation drawer.
@@ -103,6 +113,23 @@ public class TripDirections extends ActionBarActivity {
         });
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Bundle bundle = intent.getExtras();
+        trip = bundle.getParcelable("trip");
+        createTrip(trip);
+        TextView origin = (TextView) findViewById(R.id.origin);
+        TextView destination = (TextView) findViewById(R.id.destination);
+        origin.setText(trip.getOrigin());
+        destination.setText(trip.getDestination());
+        try {
+            initializeMap();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        changeButtonState();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,7 +221,10 @@ public class TripDirections extends ActionBarActivity {
                     for (int i = 0; i < steps; i++) {
                         String instruction = directions.routes.get(0).step.get(0).instruction.get(i)
                                 .instructions;
-                        if (directions.routes.get(0).step.get(0).instruction.get(i).details != null) {
+                        String travelMode = directions.routes.get(0).step.get(0).instruction.get(i).travelMode;
+                        String overviewPolyline = directions.routes.get(0).polyline.overviewPolyline;
+                        Log.i("Start_End", directions.routes.get(0).step.get(0).startLocation.lat + "|" + directions.routes.get(0).step.get(0).startLocation.lng);
+                        if (travelMode != null && travelMode.equals("TRANSIT")) {
                             String departure = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.departure.name;
                             String arrival = directions.routes.get(0).step.get(0).instruction.get(i)
@@ -204,6 +234,7 @@ public class TripDirections extends ActionBarActivity {
                             String headsign = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.headsign;
                             //tripDirections.add(new DirectionStep(instruction, departure, arrival));
+
                             tripDirections.add(new DirectionStep(instruction, departure, arrival, route, headsign));
                         } else {
                             tripDirections.add(new DirectionStep(instruction));
@@ -290,6 +321,17 @@ public class TripDirections extends ActionBarActivity {
         }
     }
 
+    private void initializeMap() {
+        if (googleMap == null) {
+            googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+
+            if (googleMap == null) {
+                Toast.makeText(getApplicationContext(), "Error creating map. Please try again later.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     public static class DirectionsResult {
         @Key("routes")
         public List<Route> routes;
@@ -301,11 +343,30 @@ public class TripDirections extends ActionBarActivity {
     public static class Route {
         @Key("legs")
         public List<Step> step;
+
+        @Key("overview_polyline")
+        public Polyline polyline;
+    }
+
+    public static class Polyline {
+        @Key("points")
+        public String overviewPolyline;
     }
 
     public static class Step {
+        @Key("start_location")
+        public StartLocation startLocation;
+
         @Key("steps")
         public List<Instruction> instruction;
+    }
+
+    public static class StartLocation {
+        @Key("lat")
+        public long lat;
+
+        @Key("lng")
+        public long lng;
     }
 
     public static class Instruction {
@@ -314,6 +375,9 @@ public class TripDirections extends ActionBarActivity {
 
         @Key("transit_details")
         public Detail details;
+
+        @Key("travel_mode")
+        public String travelMode;
     }
 
     public static class Detail {

@@ -337,6 +337,8 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         EditText from = (EditText) findViewById(R.id.from);
         EditText to = (EditText) findViewById(R.id.to);
 
+        Log.i("TRIP", from.getText().toString() + " -> " + to.getText().toString());
+
         Intent intent = new Intent(TripPlanner.this, TripDirections.class);
         Bundle bundle = new Bundle();
         bundle.putParcelable("trip", new Trip(from.getText().toString(), to.getText().toString(), ""));
