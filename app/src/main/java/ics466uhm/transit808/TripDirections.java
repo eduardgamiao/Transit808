@@ -2,6 +2,7 @@ package ics466uhm.transit808;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
@@ -38,6 +40,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
+import com.google.maps.android.PolyUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +60,10 @@ public class TripDirections extends ActionBarActivity {
     private String mActivityTitle;
     private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
     private LatLng startingCoordinates;
+    private LatLng endingCoordinates;
+    private List<LatLng> coordinatesList;
     private GoogleMap googleMap;
+    private String overviewPolyline;
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -217,7 +223,9 @@ public class TripDirections extends ActionBarActivity {
                         String travelMode = directions.routes.get(0).step.get(0).instruction.get(i).travelMode;
                         startingCoordinates = new LatLng(directions.routes.get(0).step.get(0).startLocation.lat,
                                 directions.routes.get(0).step.get(0).startLocation.lng);
-                        String overviewPolyline = directions.routes.get(0).polyline.overviewPolyline;
+                        endingCoordinates = new LatLng(directions.routes.get(0).step.get(0).endLocation.lat,
+                                directions.routes.get(0).step.get(0).endLocation.lng);
+                        overviewPolyline = directions.routes.get(0).polyline.overviewPolyline;
                         Log.i("COORDINATES", startingCoordinates.latitude + "|" + startingCoordinates.longitude);
                         if (travelMode != null && travelMode.equals("TRANSIT")) {
                             String departure = directions.routes.get(0).step.get(0).instruction.get(i)
@@ -228,8 +236,13 @@ public class TripDirections extends ActionBarActivity {
                                     .details.line.route;
                             String headsign = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.headsign;
-                            //tripDirections.add(new DirectionStep(instruction, departure, arrival));
-
+                            //LatLng coordinates = new LatLng(directions.routes.get(0).step.get(0).instruction.get(i)
+                             //       .stepStartCoordinate.lat, directions.routes.get(0).step.get(0)
+                              //      .instruction.get(i)
+                               //     .stepStartCoordinate.lng);
+                            //if (coordinates != startingCoordinates || coordinates != endingCoordinates) {
+                             //   coordinatesList.add(coordinates);
+                            //}
                             tripDirections.add(new DirectionStep(instruction, departure, arrival, route, headsign));
                         } else {
                             tripDirections.add(new DirectionStep(instruction));
@@ -332,6 +345,10 @@ public class TripDirections extends ActionBarActivity {
             }
             else {
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingCoordinates, 15));
+                googleMap.addPolyline(new PolylineOptions().addAll(PolyUtil.decode(overviewPolyline)).width(3));
+                googleMap.getUiSettings().setZoomControlsEnabled(true);
+                googleMap.addMarker(new MarkerOptions().position(startingCoordinates).title(trip.getOriginShort()));
+                googleMap.addMarker(new MarkerOptions().position(endingCoordinates).title(trip.getDestinationShort()));
             }
         }
     }
@@ -361,11 +378,22 @@ public class TripDirections extends ActionBarActivity {
         @Key("start_location")
         public StartLocation startLocation;
 
+        @Key("end_location")
+        public EndLocation endLocation;
+
         @Key("steps")
         public List<Instruction> instruction;
     }
 
     public static class StartLocation {
+        @Key("lat")
+        public double lat;
+
+        @Key("lng")
+        public double lng;
+    }
+
+    public static class EndLocation {
         @Key("lat")
         public double lat;
 
@@ -382,6 +410,14 @@ public class TripDirections extends ActionBarActivity {
 
         @Key("travel_mode")
         public String travelMode;
+    }
+
+    public class StepStartLocation {
+        @Key("lat")
+        public double lat;
+
+        @Key("lng")
+        public double lng;
     }
 
     public static class Detail {
