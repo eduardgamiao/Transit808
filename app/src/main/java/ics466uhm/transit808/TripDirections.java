@@ -3,7 +3,6 @@ package ics466uhm.transit808;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
@@ -17,12 +16,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -59,11 +56,10 @@ public class TripDirections extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
     private static final String PLACES_API_DIRECTIONS = "https://maps.googleapis.com/maps/api/directions/json?";
-    private LatLng startingCoordinates;
-    private LatLng endingCoordinates;
     private List<LatLng> coordinatesList;
     private GoogleMap googleMap;
     private String overviewPolyline;
+    private ArrayList<DirectionStep> tripDirections = new ArrayList<DirectionStep>();
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -195,7 +191,6 @@ public class TripDirections extends ActionBarActivity {
     }
 
     private class DirectionsFetcher extends AsyncTask<String, Integer, String> {
-        private ArrayList<DirectionStep> tripDirections = new ArrayList<DirectionStep>();
         private Context context;
 
         public DirectionsFetcher(Context context) {
@@ -221,12 +216,11 @@ public class TripDirections extends ActionBarActivity {
                         String instruction = directions.routes.get(0).step.get(0).instruction.get(i)
                                 .instructions;
                         String travelMode = directions.routes.get(0).step.get(0).instruction.get(i).travelMode;
-                        startingCoordinates = new LatLng(directions.routes.get(0).step.get(0).startLocation.lat,
-                                directions.routes.get(0).step.get(0).startLocation.lng);
-                        endingCoordinates = new LatLng(directions.routes.get(0).step.get(0).endLocation.lat,
-                                directions.routes.get(0).step.get(0).endLocation.lng);
                         overviewPolyline = directions.routes.get(0).polyline.overviewPolyline;
-                        Log.i("COORDINATES", startingCoordinates.latitude + "|" + startingCoordinates.longitude);
+                        double startLatitude = directions.routes.get(0).step.get(0).instruction.get(i).startLocation.lat;
+                        double startLongitude = directions.routes.get(0).step.get(0).instruction.get(i).startLocation.lng;
+                        double endLatitude = directions.routes.get(0).step.get(0).instruction.get(i).endLocation.lat;
+                        double endLongitude = directions.routes.get(0).step.get(0).instruction.get(i).endLocation.lng;
                         if (travelMode != null && travelMode.equals("TRANSIT")) {
                             String departure = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.departure.name;
@@ -236,16 +230,16 @@ public class TripDirections extends ActionBarActivity {
                                     .details.line.route;
                             String headsign = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.headsign;
-                            //LatLng coordinates = new LatLng(directions.routes.get(0).step.get(0).instruction.get(i)
-                             //       .stepStartCoordinate.lat, directions.routes.get(0).step.get(0)
-                              //      .instruction.get(i)
-                               //     .stepStartCoordinate.lng);
-                            //if (coordinates != startingCoordinates || coordinates != endingCoordinates) {
-                             //   coordinatesList.add(coordinates);
-                            //}
-                            tripDirections.add(new DirectionStep(instruction, departure, arrival, route, headsign));
+                            tripDirections.add(new DirectionStep(instruction, departure, arrival,
+                                    route, headsign, startLatitude, startLongitude, endLatitude, endLongitude));
                         } else {
-                            tripDirections.add(new DirectionStep(instruction));
+                            tripDirections.add(new DirectionStep(instruction, startLatitude, startLongitude, endLatitude, endLongitude));
+                            int walkingStepsSize = directions.routes.get(0).step.get(0).instruction
+                                    .get(i).steps.size();
+                            for (int h = 0; h < walkingStepsSize; h++) {
+                                Log.i("STEPS " + h, directions.routes.get(0).step.get(0).instruction
+                                        .get(i).steps.get(h).walkingInstructions);
+                            }
                         }
                     }
                 }
@@ -285,8 +279,6 @@ public class TripDirections extends ActionBarActivity {
     }
 
     public ArrayList<DirectionStep> createTrip(Trip trip) {
-        Log.i("Create", trip.getOrigin() + " -> " + trip.getDestination());
-
         DirectionsFetcher df = new DirectionsFetcher(this);
 
         df.execute(trip.getOrigin(), trip.getDestination());
@@ -303,7 +295,6 @@ public class TripDirections extends ActionBarActivity {
         url.put("mode", "transit");
         url.put("travel_mode", "bus");
         url.put("travel_routing_preference", "fewer_transfers");
-        Log.i("URL_DIRECTIONS", url.toString());
         return url;
     }
 
@@ -344,11 +335,23 @@ public class TripDirections extends ActionBarActivity {
                         Toast.LENGTH_SHORT).show();
             }
             else {
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingCoordinates, 15));
-                googleMap.addPolyline(new PolylineOptions().addAll(PolyUtil.decode(overviewPolyline)).width(3));
-                googleMap.getUiSettings().setZoomControlsEnabled(true);
-                googleMap.addMarker(new MarkerOptions().position(startingCoordinates).title(trip.getOriginShort()));
-                googleMap.addMarker(new MarkerOptions().position(endingCoordinates).title(trip.getDestinationShort()));
+                if (!(tripDirections.isEmpty())) {
+                    for (DirectionStep currentStep : tripDirections) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(currentStep.getStartLatitude(), currentStep.getStartLongitude()))
+                                .title(currentStep.getInstruction()));
+                    }
+                    DirectionStep lastStep = tripDirections.get(tripDirections.size() - 1);
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(lastStep.getEndLatitude(), lastStep.getEndLongitude()))
+                            .title("Destination"));
+                    DirectionStep step = tripDirections.get(0);
+                    LatLng start = new LatLng(step.getStartLatitude(), step.getStartLongitude());
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 15));
+                    googleMap.addPolyline(new PolylineOptions().addAll(PolyUtil
+                             .decode(overviewPolyline)).width(5).color(Color.BLUE));
+                    googleMap.getUiSettings().setZoomControlsEnabled(true);
+                }
             }
         }
     }
@@ -375,14 +378,28 @@ public class TripDirections extends ActionBarActivity {
     }
 
     public static class Step {
+        @Key("steps")
+        public List<Instruction> instruction;
+    }
+
+    public static class Instruction {
         @Key("start_location")
         public StartLocation startLocation;
 
         @Key("end_location")
         public EndLocation endLocation;
 
+        @Key("html_instructions")
+        public String instructions;
+
+        @Key("transit_details")
+        public Detail details;
+
+        @Key("travel_mode")
+        public String travelMode;
+
         @Key("steps")
-        public List<Instruction> instruction;
+        public List<WalkingStep> steps;
     }
 
     public static class StartLocation {
@@ -401,23 +418,9 @@ public class TripDirections extends ActionBarActivity {
         public double lng;
     }
 
-    public static class Instruction {
+    public static class WalkingStep {
         @Key("html_instructions")
-        public String instructions;
-
-        @Key("transit_details")
-        public Detail details;
-
-        @Key("travel_mode")
-        public String travelMode;
-    }
-
-    public class StepStartLocation {
-        @Key("lat")
-        public double lat;
-
-        @Key("lng")
-        public double lng;
+        public String walkingInstructions;
     }
 
     public static class Detail {

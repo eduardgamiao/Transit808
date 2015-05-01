@@ -8,30 +8,27 @@ import android.os.Parcelable;
  * Created by eduardgamiao on 3/18/15.
  */
 public class DirectionStep implements Parcelable {
-    public String instruction;
-    public String departureStop = "";
-    public String arrivalStop = "";
-    public String route = "";
-    public String headsign = "";
+    private String instruction;
+    private String departureStop = "";
+    private String arrivalStop = "";
+    private String route = "";
+    private String headsign = "";
+    private double startLatitude;
+    private double startLongitude;
+    private double endLatitude;
+    private double endLongitude;
 
     /**
      * Constructor.
      * @param instruction Direction instruction.
      */
-    public DirectionStep(String instruction) {
+    public DirectionStep(String instruction, double startLatitude, double startLongitude,
+                         double endLatitude, double endLongitude) {
         this.instruction = instruction;
-    }
-
-    /**
-     * Constructor.
-     * @param instruction Direction instruction.
-     * @param departureStop Departure stop.
-     * @param arrivalStop Arrival stop.
-     */
-    public DirectionStep(String instruction, String departureStop, String arrivalStop) {
-        this.instruction = instruction;
-        this.departureStop = departureStop;
-        this.arrivalStop = arrivalStop;
+        this.startLatitude = startLatitude;
+        this.startLongitude = startLongitude;
+        this.endLatitude = endLatitude;
+        this.endLongitude = endLongitude;
     }
 
     /**
@@ -43,12 +40,17 @@ public class DirectionStep implements Parcelable {
      * @param headsign Route name.
      */
     public DirectionStep(String instruction, String departureStop, String arrivalStop, String route,
-                         String headsign) {
+                         String headsign, double startLatitude, double startLongitude,
+                         double endLatitude, double endLongitude) {
         this.instruction = instruction;
         this.departureStop = departureStop;
         this.arrivalStop = arrivalStop;
         this.route = route;
         this.headsign = headsign;
+        this.startLatitude = startLatitude;
+        this.startLongitude = startLongitude;
+        this.endLatitude = endLatitude;
+        this.endLongitude = endLongitude;
     }
 
     /**
@@ -61,6 +63,8 @@ public class DirectionStep implements Parcelable {
         arrivalStop = in.readString();
         route = in.readString();
         headsign = in.readString();
+        startLatitude = in.readDouble();
+        startLongitude = in.readDouble();
     }
 
     public String getInstruction() {
@@ -103,6 +107,39 @@ public class DirectionStep implements Parcelable {
         this.headsign = headsign;
     }
 
+    public double getStartLongitude() {
+        return startLongitude;
+    }
+
+    public void setStartLongitude(double startLongitude) {
+        this.startLongitude = startLongitude;
+    }
+
+    public double getStartLatitude() {
+        return startLatitude;
+    }
+
+    public void setStarttLatitude(double latitude) {
+        this.startLatitude = latitude;
+    }
+
+    public double getEndLatitude() {
+        return endLatitude;
+    }
+
+    public void setEndLatitude(double endLatitude) {
+        this.endLatitude = endLatitude;
+    }
+
+    public double getEndLongitude() {
+        return endLongitude;
+    }
+
+    public void setEndLongitude(double endLongitude) {
+        this.endLongitude = endLongitude;
+    }
+
+
     public String toString() {
         if (this.arrivalStop.isEmpty() || this.departureStop.isEmpty()) {
             return this.instruction;
@@ -123,6 +160,8 @@ public class DirectionStep implements Parcelable {
         dest.writeString(arrivalStop);
         dest.writeString(route);
         dest.writeString(headsign);
+        dest.writeDouble(startLatitude);
+        dest.writeDouble(startLongitude);
     }
 
     public static final Creator<DirectionStep> CREATOR = new Parcelable.Creator<DirectionStep>() {
