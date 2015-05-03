@@ -39,7 +39,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.maps.android.PolyUtil;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -231,9 +233,11 @@ public class TripDirections extends ActionBarActivity {
                             String headsign = directions.routes.get(0).step.get(0).instruction.get(i)
                                     .details.headsign;
                             tripDirections.add(new DirectionStep(instruction, departure, arrival,
-                                    route, headsign, startLatitude, startLongitude, endLatitude, endLongitude));
+                                    route, headsign, startLatitude, startLongitude, endLatitude, endLongitude,
+                                    travelMode));
                         } else {
-                            tripDirections.add(new DirectionStep(instruction, startLatitude, startLongitude, endLatitude, endLongitude));
+                            tripDirections.add(new DirectionStep(instruction, startLatitude, startLongitude,
+                                    endLatitude, endLongitude, travelMode));
                             int walkingStepsSize = directions.routes.get(0).step.get(0).instruction
                                     .get(i).steps.size();
                             for (int h = 0; h < walkingStepsSize; h++) {
@@ -271,6 +275,23 @@ public class TripDirections extends ActionBarActivity {
             catch (Exception e) {
                 e.printStackTrace();
             }
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
+                    if (step.getTravelMode().equals("TRANSIT")) {
+                        BusStop stop = getStop(step.getDepartureStop());
+                        if (stop != null) {
+                            Intent intent = new Intent(TripDirections.this, StopDetails.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable("stop", stop);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
+                    }
+                }
+            });
         }
 
         public ArrayList<DirectionStep> getDirections() {
@@ -354,6 +375,28 @@ public class TripDirections extends ActionBarActivity {
                 }
             }
         }
+    }
+
+    private BusStop getStop(String departureStop) {
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(
+                    new InputStreamReader(getAssets().open("stops.txt")));
+            String currentLine;
+            String []lineArray;
+            while ((currentLine = br.readLine()) != null) {
+                lineArray = currentLine.split(",");
+                Log.i("STOP", lineArray[7]);
+                if (lineArray[7].equalsIgnoreCase(departureStop)) {
+                    return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static class DirectionsResult {

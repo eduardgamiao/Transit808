@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,15 +32,18 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
 
         TextView instruction = (TextView) convertView.findViewById(R.id.instruction);
         TextView stops = (TextView) convertView.findViewById(R.id.stops);
+        ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
 
         instruction.setText(step.getInstruction());
-        if (!((step.getDepartureStop().equals("") && step.getArrivalStop().equals("")))) {
+        if (step.getTravelMode().equals("TRANSIT")) {
             stops.setText("Take Bus [" + step.getRoute() + " - " +
                     step.getHeadsign() + "] from " + step.getDepartureStop() + " to " + step.getArrivalStop());
             stops.setVisibility(TextView.VISIBLE);
+            icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
         }
         else {
             stops.setVisibility(TextView.GONE);
+            icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_walk_black_48dp));
         }
 
         return convertView;

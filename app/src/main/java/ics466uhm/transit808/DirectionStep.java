@@ -17,18 +17,20 @@ public class DirectionStep implements Parcelable {
     private double startLongitude;
     private double endLatitude;
     private double endLongitude;
+    private String travelMode;
 
     /**
      * Constructor.
      * @param instruction Direction instruction.
      */
     public DirectionStep(String instruction, double startLatitude, double startLongitude,
-                         double endLatitude, double endLongitude) {
+                         double endLatitude, double endLongitude, String travelMode) {
         this.instruction = instruction;
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
         this.endLatitude = endLatitude;
         this.endLongitude = endLongitude;
+        this.travelMode = travelMode;
     }
 
     /**
@@ -41,7 +43,7 @@ public class DirectionStep implements Parcelable {
      */
     public DirectionStep(String instruction, String departureStop, String arrivalStop, String route,
                          String headsign, double startLatitude, double startLongitude,
-                         double endLatitude, double endLongitude) {
+                         double endLatitude, double endLongitude, String travelMode) {
         this.instruction = instruction;
         this.departureStop = departureStop;
         this.arrivalStop = arrivalStop;
@@ -51,6 +53,7 @@ public class DirectionStep implements Parcelable {
         this.startLongitude = startLongitude;
         this.endLatitude = endLatitude;
         this.endLongitude = endLongitude;
+        this.travelMode = travelMode;
     }
 
     /**
@@ -65,6 +68,7 @@ public class DirectionStep implements Parcelable {
         headsign = in.readString();
         startLatitude = in.readDouble();
         startLongitude = in.readDouble();
+        travelMode = in.readString();
     }
 
     public String getInstruction() {
@@ -139,6 +143,15 @@ public class DirectionStep implements Parcelable {
         this.endLongitude = endLongitude;
     }
 
+    public String getTravelMode() {
+        return travelMode;
+    }
+
+    public void setTravelMode(String travelMode) {
+        this.travelMode = travelMode;
+    }
+
+
 
     public String toString() {
         if (this.arrivalStop.isEmpty() || this.departureStop.isEmpty()) {
@@ -162,6 +175,7 @@ public class DirectionStep implements Parcelable {
         dest.writeString(headsign);
         dest.writeDouble(startLatitude);
         dest.writeDouble(startLongitude);
+        dest.writeString(travelMode);
     }
 
     public static final Creator<DirectionStep> CREATOR = new Parcelable.Creator<DirectionStep>() {
