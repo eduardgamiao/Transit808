@@ -277,7 +277,7 @@ public class TripDirections extends ActionBarActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
                     if (step.getTravelMode().equals("TRANSIT")) {
-                        BusStop stop = getStop(step.getDepartureStop());
+                        BusStop stop = getStop(step.getStartLatitude(), step.getStartLongitude());
                         if (stop != null) {
                             Intent intent = new Intent(TripDirections.this, StopDetails.class);
                             Bundle bundle = new Bundle();
@@ -373,7 +373,7 @@ public class TripDirections extends ActionBarActivity {
         }
     }
 
-    private BusStop getStop(String departureStop) {
+    private BusStop getStop(double latitude, double longitude) {
         BufferedReader br = null;
 
         try {
@@ -383,8 +383,9 @@ public class TripDirections extends ActionBarActivity {
             String []lineArray;
             while ((currentLine = br.readLine()) != null) {
                 lineArray = currentLine.split(",");
-                Log.i("STOP", lineArray[7]);
-                if (lineArray[7].equalsIgnoreCase(departureStop)) {
+                double currentLatitude = Double.parseDouble(lineArray[0]);
+                double currentLongitude = Double.parseDouble(lineArray[2]);
+                if (latitude == currentLatitude && longitude == currentLongitude) {
                     return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
                 }
             }
