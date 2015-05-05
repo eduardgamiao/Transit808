@@ -79,7 +79,7 @@ public class StopDetails extends ActionBarActivity {
                         intent = new Intent(StopDetails.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(StopDetails.this, BusStopSearchActivity.class);
+                        intent = new Intent(StopDetails.this, BusStopTextSearch.class);
                         break;
                     case 2:
                         intent = new Intent(StopDetails.this, TripPlanner.class);
@@ -107,7 +107,22 @@ public class StopDetails extends ActionBarActivity {
         if (bundle != null) {
             stop = bundle.getParcelable("stop");
             TextView title = (TextView) findViewById(R.id.stop_title);
-            title.append(stop.getStreetName());
+            title.setText(stop.getStreetName());
+            RetrieveFeed feed = new RetrieveFeed();
+            feed.execute(prepareURL(stop.getStopID()));
+            changeButtonState();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            stop = bundle.getParcelable("stop");
+            Log.i("RESUMING", stop.getStreetName());
+            TextView title = (TextView) findViewById(R.id.stop_title);
+            title.setText(stop.getStreetName());
             RetrieveFeed feed = new RetrieveFeed();
             feed.execute(prepareURL(stop.getStopID()));
             changeButtonState();

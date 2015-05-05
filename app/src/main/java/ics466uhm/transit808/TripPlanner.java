@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,7 +20,6 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,22 +36,8 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -118,7 +101,7 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
                         intent = new Intent(TripPlanner.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(TripPlanner.this, BusStopSearchActivity.class);
+                        intent = new Intent(TripPlanner.this, BusStopTextSearch.class);
                         break;
                     case 2:
                         break;
@@ -336,6 +319,8 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
     public void createTrip(View view) {
         EditText from = (EditText) findViewById(R.id.from);
         EditText to = (EditText) findViewById(R.id.to);
+
+        Log.i("TRIP", from.getText().toString() + " -> " + to.getText().toString());
 
         Intent intent = new Intent(TripPlanner.this, TripDirections.class);
         Bundle bundle = new Bundle();
