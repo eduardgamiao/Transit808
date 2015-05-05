@@ -240,10 +240,6 @@ public class TripDirections extends ActionBarActivity {
                                     endLatitude, endLongitude, travelMode));
                             int walkingStepsSize = directions.routes.get(0).step.get(0).instruction
                                     .get(i).steps.size();
-                            for (int h = 0; h < walkingStepsSize; h++) {
-                                Log.i("STEPS " + h, directions.routes.get(0).step.get(0).instruction
-                                        .get(i).steps.get(h).walkingInstructions);
-                            }
                         }
                     }
                 }
