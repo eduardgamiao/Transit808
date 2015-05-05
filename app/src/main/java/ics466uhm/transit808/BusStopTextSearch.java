@@ -13,8 +13,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BusStopSearchActivity extends ActionBarActivity {
+public class BusStopTextSearch extends ActionBarActivity {
     // Navigation drawer fields.
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
@@ -34,6 +38,9 @@ public class BusStopSearchActivity extends ActionBarActivity {
     private ListView listView;
     BusStopAdapter adapter;
     EditText editText;
+    private GoogleMap googleMap;
+    private boolean isTextVisible = true;
+    private boolean isMapVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +70,7 @@ public class BusStopSearchActivity extends ActionBarActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                BusStopSearchActivity.this.adapter.getFilter().filter(s);
+                BusStopTextSearch.this.adapter.getFilter().filter(s);
             }
         });
 
@@ -74,7 +81,7 @@ public class BusStopSearchActivity extends ActionBarActivity {
                          parent.getAdapter().getItem(position).toString(),
                          Toast.LENGTH_SHORT).show();
                 BusStop stop = (BusStop) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(BusStopSearchActivity.this, StopDetails.class);
+                Intent intent = new Intent(BusStopTextSearch.this, StopDetails.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("stop", stop);
                 intent.putExtras(bundle);
@@ -98,12 +105,12 @@ public class BusStopSearchActivity extends ActionBarActivity {
                 Intent intent = null;
                 switch(position) {
                     case 0:
-                        intent = new Intent(BusStopSearchActivity.this, MainActivity.class);
+                        intent = new Intent(BusStopTextSearch.this, MainActivity.class);
                         break;
                     case 1:
                         break;
                     case 2:
-                        intent = new Intent(BusStopSearchActivity.this, TripPlanner.class);
+                        intent = new Intent(BusStopTextSearch.this, TripPlanner.class);
                         break;
                     default:
                         break;
@@ -163,6 +170,30 @@ public class BusStopSearchActivity extends ActionBarActivity {
         }
 
         return stops;
+    }
+
+    public void expandMap(View view) {
+        LinearLayout map = (LinearLayout) findViewById(R.id.mapSection);
+        if (isMapVisible) {
+            map.setVisibility(View.GONE);
+            isMapVisible = false;
+        }
+        else {
+            map.setVisibility(View.VISIBLE);
+            isMapVisible = true;
+        }
+    }
+
+    public void expandText(View view) {
+        LinearLayout text = (LinearLayout) findViewById(R.id.searchByText);
+        if (isTextVisible) {
+            text.setVisibility(View.GONE);
+            isTextVisible = false;
+        }
+        else {
+            text.setVisibility(View.VISIBLE);
+            isTextVisible = true;
+        }
     }
 
     @Override

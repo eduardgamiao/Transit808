@@ -99,7 +99,7 @@ public class TripDirections extends ActionBarActivity {
                         intent = new Intent(TripDirections.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(TripDirections.this, BusStopSearchActivity.class);
+                        intent = new Intent(TripDirections.this, BusStopTextSearch.class);
                         break;
                     case 2:
                         intent = new Intent(TripDirections.this, TripPlanner.class);
