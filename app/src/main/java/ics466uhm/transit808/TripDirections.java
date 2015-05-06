@@ -9,7 +9,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -99,7 +98,7 @@ public class TripDirections extends ActionBarActivity {
                         intent = new Intent(TripDirections.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(TripDirections.this, BusStopTextSearch.class);
+                        intent = new Intent(TripDirections.this, BusStopSearch.class);
                         break;
                     case 2:
                         intent = new Intent(TripDirections.this, TripPlanner.class);

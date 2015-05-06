@@ -51,4 +51,7 @@
     <string name="title_activity_bus_stop_menu_search">BusStopMenuSearch</string>
     <string name="searchByText">Search By Text</string>
     <string name="searchByMap">Search By Map</string>
+    <string name="view_map">View On Map</string>
+    <string name="view_stop">View Bus Stop</string>
+    <string name="view_by">Search By:</string>
 </resources>

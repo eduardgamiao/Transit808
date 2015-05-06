@@ -16,7 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/origin_title"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/abc_primary_text_material_light"/>
 
     </LinearLayout>
@@ -34,7 +33,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/destination_title"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/abc_primary_text_material_light"/>
 
      </LinearLayout>

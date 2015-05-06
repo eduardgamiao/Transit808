@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BusStopTextSearch"
+            android:name=".BusStopSearch"
             android:label="@string/title_activity_bus_stop_search"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden" >
@@ -53,7 +53,8 @@
         </activity>
         <activity
             android:name=".TripDirections"
-            android:label="@string/title_activity_route" >
+            android:label="@string/title_activity_route"
+            android:launchMode="singleTask" >
         </activity>
         <activity
             android:name=".BusStopMapSearch"

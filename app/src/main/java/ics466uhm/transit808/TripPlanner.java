@@ -101,7 +101,7 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
                         intent = new Intent(TripPlanner.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(TripPlanner.this, BusStopTextSearch.class);
+                        intent = new Intent(TripPlanner.this, BusStopSearch.class);
                         break;
                     case 2:
                         break;

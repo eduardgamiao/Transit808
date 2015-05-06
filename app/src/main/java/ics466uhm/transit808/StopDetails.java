@@ -79,7 +79,7 @@ public class StopDetails extends ActionBarActivity {
                         intent = new Intent(StopDetails.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(StopDetails.this, BusStopTextSearch.class);
+                        intent = new Intent(StopDetails.this, BusStopSearch.class);
                         break;
                     case 2:
                         intent = new Intent(StopDetails.this, TripPlanner.class);

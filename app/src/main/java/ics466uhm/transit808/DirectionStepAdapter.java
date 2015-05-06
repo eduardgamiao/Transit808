@@ -9,6 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.MapFragment;
 
 import java.util.ArrayList;
 
@@ -24,7 +27,7 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        DirectionStep step = directions.get(position);
+        final DirectionStep step = directions.get(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.direction_step, parent, false);
@@ -32,6 +35,7 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
 
         TextView instruction = (TextView) convertView.findViewById(R.id.instruction);
         TextView stops = (TextView) convertView.findViewById(R.id.stops);
+        TextView viewOnMap = (TextView) convertView.findViewById(R.id.viewStop);
         ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
 
         instruction.setText(step.getInstruction());
@@ -40,11 +44,20 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
                     step.getHeadsign() + "] from " + step.getDepartureStop() + " to " + step.getArrivalStop());
             stops.setVisibility(TextView.VISIBLE);
             icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
+            viewOnMap.setVisibility(TextView.VISIBLE);
         }
         else {
             stops.setVisibility(TextView.GONE);
+            viewOnMap.setVisibility(TextView.GONE);
             icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_walk_black_48dp));
         }
+
+        viewOnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         return convertView;
     }

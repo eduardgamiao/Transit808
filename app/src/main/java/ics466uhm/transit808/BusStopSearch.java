@@ -2,11 +2,9 @@ package ics466uhm.transit808;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -23,6 +21,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class BusStopTextSearch extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
+public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     // Navigation drawer fields.
     private ListView mDrawerList;
@@ -105,7 +104,7 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
 
             @Override
             public void afterTextChanged(Editable s) {
-                BusStopTextSearch.this.adapter.getFilter().filter(s);
+                BusStopSearch.this.adapter.getFilter().filter(s);
             }
         });
 
@@ -116,7 +115,7 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
                         parent.getAdapter().getItem(position).toString(),
                         Toast.LENGTH_SHORT).show();
                 BusStop stop = (BusStop) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(BusStopTextSearch.this, StopDetails.class);
+                Intent intent = new Intent(BusStopSearch.this, StopDetails.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("stop", stop);
                 intent.putExtras(bundle);
@@ -144,12 +143,12 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
                 Intent intent = null;
                 switch (position) {
                     case 0:
-                        intent = new Intent(BusStopTextSearch.this, MainActivity.class);
+                        intent = new Intent(BusStopSearch.this, MainActivity.class);
                         break;
                     case 1:
                         break;
                     case 2:
-                        intent = new Intent(BusStopTextSearch.this, TripPlanner.class);
+                        intent = new Intent(BusStopSearch.this, TripPlanner.class);
                         break;
                     default:
                         break;
@@ -230,27 +229,22 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
         return stops;
     }
 
-    public void expandMap(View view) {
-        LinearLayout map = (LinearLayout) findViewById(R.id.mapSection);
-        if (isMapVisible) {
-            map.setVisibility(View.GONE);
-            isMapVisible = false;
-        }
-        else {
-            map.setVisibility(View.VISIBLE);
-            isMapVisible = true;
-        }
-    }
+    public void onToggleClicked(View view) {
+        boolean on = ((ToggleButton) view).isChecked();
+        LinearLayout textLayout = (LinearLayout) findViewById(R.id.textSection);
+        LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapSection);
 
-    public void expandText(View view) {
-        LinearLayout text = (LinearLayout) findViewById(R.id.searchByText);
-        if (isTextVisible) {
-            text.setVisibility(View.GONE);
-            isTextVisible = false;
-        }
-        else {
-            text.setVisibility(View.VISIBLE);
-            isTextVisible = true;
+        if (textLayout != null && mapLayout != null) {
+            if (on) {
+                Log.i("STATE", "MAP");
+                textLayout.setVisibility(View.GONE);
+                mapLayout.setVisibility(View.VISIBLE);
+                setCurrentLocation();
+            } else {
+                Log.i("STATE", "TEXT");
+                textLayout.setVisibility(View.VISIBLE);
+                mapLayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -261,7 +255,6 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
     }
 
     private void setCurrentLocation() {
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
             if (mGoogleApiClient.isConnected()) {
                 Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation != null) {
@@ -375,7 +368,6 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
 
     @Override
     public void onConnected(Bundle bundle) {
-        setCurrentLocation();
     }
 
     @Override
