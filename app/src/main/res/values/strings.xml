@@ -53,5 +53,6 @@
     <string name="searchByMap">Search By Map</string>
     <string name="view_map">View On Map</string>
     <string name="view_stop">View Bus Stop</string>
-    <string name="view_by">Search By:</string>
+    <string name="search_by">Search By:</string>
+    <string name="view_by">View By:</string>
 </resources>

@@ -9,15 +9,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -393,6 +396,24 @@ public class TripDirections extends ActionBarActivity {
         }
 
         return null;
+    }
+
+    public void onToggleClicked(View view) {
+        boolean on = ((ToggleButton) view).isChecked();
+        LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
+        LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapDirections);
+
+        if (textLayout != null && mapLayout != null) {
+            if (on) {
+                Log.i("STATE", "MAP");
+                textLayout.setVisibility(View.GONE);
+                mapLayout.setVisibility(View.VISIBLE);
+            } else {
+                Log.i("STATE", "TEXT");
+                textLayout.setVisibility(View.VISIBLE);
+                mapLayout.setVisibility(View.GONE);
+            }
+        }
     }
 
     public static class DirectionsResult {

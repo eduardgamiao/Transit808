@@ -329,6 +329,17 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         startActivity(intent);
     }
 
+    public void clearFrom(View view) {
+        EditText from = (EditText) findViewById(R.id.from);
+        from.setText("");
+    }
+
+    public void clearTo(View view) {
+        EditText to = (EditText) findViewById(R.id.to);
+        to.setText("");
+    }
+
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);

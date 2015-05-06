@@ -24,6 +24,10 @@
         android:text="@string/from"
         android:textColor="?android:textColorSecondary"/>
 
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
     <AutoCompleteTextView
         android:id="@+id/from"
         android:layout_width="fill_parent"
@@ -31,6 +35,17 @@
         android:layout_gravity="fill_horizontal"
         android:drawablePadding="8dp"
         android:completionThreshold="3"/>
+
+        <TextView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/ic_cancel_grey600_48dp"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="10dp"
+            android:clickable="true"
+            android:onClick="clearFrom"/>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/fillFrom"
@@ -49,12 +64,28 @@
         android:text="@string/to"
         android:textColor="?android:textColorSecondary"/>
 
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
     <AutoCompleteTextView
         android:id="@+id/to"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal"
         android:completionThreshold="3"/>
+
+    <TextView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:background="@drawable/ic_cancel_grey600_48dp"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="10dp"
+        android:clickable="true"
+        android:onClick="clearTo"/>
+
+</FrameLayout>
 
     <Button
         android:id="@+id/load_directions"
@@ -64,15 +95,6 @@
         android:layout_gravity="fill_horizontal"
         android:text="@string/load_directions"
         android:onClick="createTrip"/>
-
-    <Button
-        android:id="@+id/clear_fields"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_columnSpan="1"
-        android:layout_gravity="fill_horizontal"
-        android:text="@string/clear_fields"
-        android:onClick="clearFields"/>
 
 </LinearLayout>
 
