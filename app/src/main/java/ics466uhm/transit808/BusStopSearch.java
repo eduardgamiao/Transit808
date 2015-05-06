@@ -30,6 +30,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
@@ -47,8 +48,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.WeakHashMap;
 
 
 public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -69,6 +72,7 @@ public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
     private LatLng location;
     private List<LatLng> markers = new ArrayList<LatLng>();
+    private HashMap<String, BusStop> markerMap = new HashMap<String, BusStop>();
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -311,8 +315,24 @@ public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.
         protected void onPostExecute(String result) {
             if (googleMap != null) {
                 for (LatLng current : markers) {
-                    googleMap.addMarker(new MarkerOptions().position(current));
+                    BusStop stop = getStop(current.latitude, current.longitude);
+                    Marker marker = googleMap.addMarker(new MarkerOptions().position(current)
+                            .title(stop.getStreetName()).snippet("View Bus Stop"));
+                    markerMap.put(marker.getId(), stop);
                 }
+                googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        BusStop stop = markerMap.get(marker.getId());
+                        if (stop != null) {
+                            Intent intent = new Intent(BusStopSearch.this, StopDetails.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable("stop", stop);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
+                    }
+                });
             }
         }
     }
@@ -327,6 +347,29 @@ public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.
         url.put("key", this.getResources().getString(R.string.google_browser_key));
         Log.i("URL", url.toString());
         return url;
+    }
+
+    private BusStop getStop(double latitude, double longitude) {
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(
+                    new InputStreamReader(getAssets().open("stops.txt")));
+            String currentLine;
+            String []lineArray;
+            while ((currentLine = br.readLine()) != null) {
+                lineArray = currentLine.split(",");
+                double currentLatitude = Double.parseDouble(lineArray[0]);
+                double currentLongitude = Double.parseDouble(lineArray[2]);
+                if (latitude == currentLatitude && longitude == currentLongitude) {
+                    return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**
