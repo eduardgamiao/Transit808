@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -41,9 +42,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.maps.android.PolyUtil;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +80,25 @@ public class TripDirections extends ActionBarActivity {
         origin.setText(trip.getOrigin());
         destination.setText(trip.getDestination());
         changeButtonState();
+
+        Spinner spinner = (Spinner) findViewById(R.id.toggle);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.views,
+                android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = (String) parent.getItemAtPosition(position);
+                onToggleClicked(selected);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
@@ -280,8 +298,8 @@ public class TripDirections extends ActionBarActivity {
                     if (googleMap != null) {
                         DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(step.getStartLatitude(), step.getStartLongitude()), 15));
-                        ToggleButton toggleButton = (ToggleButton) findViewById(R.id.routeToggle);
-                        toggleButton.setChecked(true);
+                        Spinner spinner = (Spinner) findViewById(R.id.toggle);
+                        spinner.setSelection(1);
                         LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
                         LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapDirections);
                         textLayout.setVisibility(View.GONE);
@@ -374,21 +392,19 @@ public class TripDirections extends ActionBarActivity {
         }
     }
 
-    public void onToggleClicked(View view) {
-        boolean on = ((ToggleButton) view).isChecked();
+    public void onToggleClicked(String selected) {
         LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
         LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapDirections);
 
-        if (textLayout != null && mapLayout != null) {
-            if (on) {
+        if (selected.equals("Map")) {
                 Log.i("STATE", "MAP");
                 textLayout.setVisibility(View.GONE);
                 mapLayout.setVisibility(View.VISIBLE);
-            } else {
+        }
+        else {
                 Log.i("STATE", "TEXT");
                 textLayout.setVisibility(View.VISIBLE);
                 mapLayout.setVisibility(View.GONE);
-            }
         }
     }
 

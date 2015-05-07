@@ -1,5 +1,6 @@
 package ics466uhm.transit808;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,8 +36,12 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -68,7 +74,6 @@ public class StopDetails extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mActivityTitle = getTitle().toString();
         setupDrawer();
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -97,14 +102,6 @@ public class StopDetails extends ActionBarActivity {
             }
         });
 
-        /**
-        Intent intent = getIntent();
-        TextView title = (TextView) findViewById(R.id.stop_title);
-        title.append(intent.getStringExtra(BusStopSearchActivity.STREET_NAME_MESSAGE));
-        RetrieveFeed feed = new RetrieveFeed();
-        feed.execute(prepareURL(intent.getStringExtra(BusStopSearchActivity.BUS_STOP_ID)));
-        stopID = intent.getStringExtra(BusStopSearchActivity.BUS_STOP_ID);
-        **/
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null) {
             stop = bundle.getParcelable("stop");
@@ -174,6 +171,8 @@ public class StopDetails extends ActionBarActivity {
         static final String KEY_ROUTE = "route";
         static final String KEY_HEADSIGN = "headsign";
         static final String KEY_STOPTIME = "stopTime";
+        static final String KEY_DATE = "date";
+        static final String KEY_TEXT_TIME = "arrivalText";
         private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
 
         public RetrieveFeed() {
@@ -191,6 +190,16 @@ public class StopDetails extends ActionBarActivity {
                 map.put(KEY_ROUTE, getValue(e, KEY_ROUTE));
                 map.put(KEY_HEADSIGN, getValue(e, KEY_HEADSIGN));
                 map.put(KEY_STOPTIME, getValue(e, KEY_STOPTIME));
+                DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+                try {
+                    Date date = formatter.parse(getValue(e, KEY_DATE) + " " + getValue(e, KEY_STOPTIME));
+                    String output = "(Arriving "
+                            +  DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(), 0).toString()
+                            + ")";
+                    map.put(KEY_TEXT_TIME, output);
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
                 arrivals.add(map);
             }
 
@@ -257,11 +266,17 @@ public class StopDetails extends ActionBarActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            adapter = new SimpleAdapter(StopDetails.this, arrivals, R.layout.stop_item,
-                    new String[] {KEY_ROUTE, KEY_HEADSIGN, KEY_STOPTIME},
-                    new int[] {R.id.route, R.id.headsign, R.id.arrivalTime});
-            ListView list = (ListView) findViewById(R.id.stop_times);
-            list.setAdapter(adapter);
+            if (arrivals.isEmpty()) {
+                TextView text = (TextView) findViewById(R.id.emptyList);
+                text.setVisibility(View.VISIBLE);
+            }
+            else {
+                adapter = new SimpleAdapter(StopDetails.this, arrivals, R.layout.stop_item,
+                        new String[]{KEY_ROUTE, KEY_HEADSIGN, KEY_STOPTIME, KEY_TEXT_TIME},
+                        new int[]{R.id.route, R.id.headsign, R.id.arrivalTime, R.id.arrivalText});
+                ListView list = (ListView) findViewById(R.id.stop_times);
+                list.setAdapter(adapter);
+            }
         }
     }
 

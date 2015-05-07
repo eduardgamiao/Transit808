@@ -29,13 +29,10 @@
             android:layout_height="wrap_content"
             android:text="@string/view_by"/>
 
-        <ToggleButton
-            android:id="@+id/routeToggle"
+        <Spinner
+            android:id="@+id/toggle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textOn="Map"
-            android:textOff="Text"
-            android:onClick="onToggleClicked"/>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
@@ -67,6 +64,11 @@
         android:layout_height="wrap_content"
         android:textColor="?android:textColorPrimary"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -88,6 +90,7 @@
         android:visibility="gone"
         android:onClick="removeTrip"
         />
+    </LinearLayout>
 
     <View
         android:layout_width="fill_parent"

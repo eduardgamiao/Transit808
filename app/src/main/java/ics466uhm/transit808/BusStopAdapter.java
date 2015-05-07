@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,9 +36,11 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
 
         TextView title = (TextView) convertView.findViewById(R.id.stop_street_name);
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
+        ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
 
         title.setText(stop.getStreetName());
         stopID.setText(stop.getStopID());
+        icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
 
         return convertView;
     }
