@@ -19,6 +19,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:textColorPrimary"
         android:gravity="center"/>
 
     <Button
@@ -27,6 +28,7 @@
         android:id="@+id/addStop"
         android:drawableLeft="@android:drawable/star_on"
         android:text="@string/stop_add_button"
+        android:textSize="12sp"
         android:visibility="visible"
         android:onClick="saveStop"
         />
@@ -37,6 +39,7 @@
         android:id="@+id/removeStop"
         android:drawableLeft="@android:drawable/star_off"
         android:text="@string/stop_remove_button"
+        android:textSize="12sp"
         android:visibility="gone"
         android:onClick="removeStop"
         />

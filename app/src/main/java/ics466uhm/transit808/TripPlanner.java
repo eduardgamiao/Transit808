@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -126,7 +127,12 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
     }
 
     public void loadCurrentLocation(View view) {
-        from.setText(this.address);
+        if (this.address.isEmpty() || this.address.equals("")) {
+            Toast.makeText(this, "Cannot Retrieve Current Location", Toast.LENGTH_LONG).show();
+        }
+        else {
+            from.setText(this.address);
+        }
     }
 
     private void setCurrentLocation() {
@@ -183,14 +189,6 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void clearFields(View view) {
-        EditText from = (EditText) findViewById(R.id.from);
-        EditText to = (EditText) findViewById(R.id.to);
-
-        from.setText("");
-        to.setText("");
     }
 
     @Override

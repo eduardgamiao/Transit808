@@ -1,6 +1,8 @@
 package ics466uhm.transit808;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.MapFragment;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -55,10 +60,40 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
         viewOnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                BusStop stop = getStop(step.getStartLatitude(), step.getStartLongitude());
+                if (stop != null) {
+                    Intent intent = new Intent(getContext(), StopDetails.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("stop", stop);
+                    intent.putExtras(bundle);
+                    getContext().startActivity(intent);
+                }
             }
         });
 
         return convertView;
+    }
+
+    private BusStop getStop(double latitude, double longitude) {
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(
+                    new InputStreamReader(getContext().getAssets().open("stops.txt")));
+            String currentLine;
+            String []lineArray;
+            while ((currentLine = br.readLine()) != null) {
+                lineArray = currentLine.split(",");
+                double currentLatitude = Double.parseDouble(lineArray[0]);
+                double currentLongitude = Double.parseDouble(lineArray[2]);
+                if (latitude == currentLatitude && longitude == currentLongitude) {
+                    return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

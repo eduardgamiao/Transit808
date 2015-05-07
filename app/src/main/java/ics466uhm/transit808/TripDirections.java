@@ -277,16 +277,15 @@ public class TripDirections extends ActionBarActivity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
-                    if (step.getTravelMode().equals("TRANSIT")) {
-                        BusStop stop = getStop(step.getStartLatitude(), step.getStartLongitude());
-                        if (stop != null) {
-                            Intent intent = new Intent(TripDirections.this, StopDetails.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable("stop", stop);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        }
+                    if (googleMap != null) {
+                        DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(step.getStartLatitude(), step.getStartLongitude()), 15));
+                        ToggleButton toggleButton = (ToggleButton) findViewById(R.id.routeToggle);
+                        toggleButton.setChecked(true);
+                        LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
+                        LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapDirections);
+                        textLayout.setVisibility(View.GONE);
+                        mapLayout.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -375,29 +374,6 @@ public class TripDirections extends ActionBarActivity {
         }
     }
 
-    private BusStop getStop(double latitude, double longitude) {
-        BufferedReader br = null;
-
-        try {
-            br = new BufferedReader(
-                    new InputStreamReader(getAssets().open("stops.txt")));
-            String currentLine;
-            String []lineArray;
-            while ((currentLine = br.readLine()) != null) {
-                lineArray = currentLine.split(",");
-                double currentLatitude = Double.parseDouble(lineArray[0]);
-                double currentLongitude = Double.parseDouble(lineArray[2]);
-                if (latitude == currentLatitude && longitude == currentLongitude) {
-                    return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     public void onToggleClicked(View view) {
         boolean on = ((ToggleButton) view).isChecked();
         LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
@@ -415,6 +391,11 @@ public class TripDirections extends ActionBarActivity {
             }
         }
     }
+
+    public void viewStop(View view) {
+        Toast.makeText(this, "Yay!!!", Toast.LENGTH_SHORT).show();
+    }
+
 
     public static class DirectionsResult {
         @Key("routes")

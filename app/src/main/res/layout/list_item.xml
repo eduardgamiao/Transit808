@@ -8,7 +8,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dip"
-        android:textSize="16dip"
         android:textColor="@color/abc_primary_text_material_light"
         android:textStyle="bold"/>
 
@@ -16,7 +15,6 @@
         android:id="@+id/stop_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dip"
-        android:textSize="16dip"/>
+        android:padding="10dip"/>
 
 </LinearLayout>
