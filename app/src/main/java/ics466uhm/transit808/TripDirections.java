@@ -255,7 +255,7 @@ public class TripDirections extends ActionBarActivity {
                             tripDirections.add(new DirectionStep(instruction, departure, arrival,
                                     route, headsign, startLatitude, startLongitude, endLatitude, endLongitude,
                                     travelMode));
-                        } else {
+                        } else if (travelMode != null && travelMode.equals("WALKING")){
                             tripDirections.add(new DirectionStep(instruction, startLatitude, startLongitude,
                                     endLatitude, endLongitude, travelMode));
                             int walkingStepsSize = directions.routes.get(0).step.get(0).instruction

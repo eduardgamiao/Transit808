@@ -52,7 +52,7 @@
     <string name="searchByText">Search By Text</string>
     <string name="searchByMap">Search By Map</string>
     <string name="view_map">View On Map</string>
-    <string name="view_stop">View Bus Stop</string>
+    <string name="view_stop"><u>View Bus Stop</u></string>
     <string name="search_by">Search By:</string>
     <string name="view_by">View By:</string>
     <string name="no_arrival_information">No stops scheduled for this stop.</string>
