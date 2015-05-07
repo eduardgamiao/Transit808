@@ -2,11 +2,9 @@ package ics466uhm.transit808;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,7 +20,9 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,7 +30,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
@@ -48,11 +50,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.WeakHashMap;
 
 
-public class BusStopTextSearch extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
+public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
     // Navigation drawer fields.
     private ListView mDrawerList;
@@ -70,6 +74,8 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
     private GoogleApiClient mGoogleApiClient;
     private LatLng location;
     private List<LatLng> markers = new ArrayList<LatLng>();
+    private HashMap<String, BusStop> markerMap = new HashMap<String, BusStop>();
+    private static final LatLng OAHU = new LatLng(21.466667, -157.983333);
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -105,18 +111,15 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
 
             @Override
             public void afterTextChanged(Editable s) {
-                BusStopTextSearch.this.adapter.getFilter().filter(s);
+                BusStopSearch.this.adapter.getFilter().filter(s);
             }
         });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(),
-                        parent.getAdapter().getItem(position).toString(),
-                        Toast.LENGTH_SHORT).show();
                 BusStop stop = (BusStop) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(BusStopTextSearch.this, StopDetails.class);
+                Intent intent = new Intent(BusStopSearch.this, StopDetails.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("stop", stop);
                 intent.putExtras(bundle);
@@ -127,6 +130,25 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
 
         buildGoogleApiClient();
         setCurrentLocation();
+
+        Spinner spinner = (Spinner) findViewById(R.id.toggle);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.views,
+                android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = (String) parent.getItemAtPosition(position);
+                onToggleClicked(selected);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
@@ -144,12 +166,12 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
                 Intent intent = null;
                 switch (position) {
                     case 0:
-                        intent = new Intent(BusStopTextSearch.this, MainActivity.class);
+                        intent = new Intent(BusStopSearch.this, MainActivity.class);
                         break;
                     case 1:
                         break;
                     case 2:
-                        intent = new Intent(BusStopTextSearch.this, TripPlanner.class);
+                        intent = new Intent(BusStopSearch.this, TripPlanner.class);
                         break;
                     default:
                         break;
@@ -230,27 +252,22 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
         return stops;
     }
 
-    public void expandMap(View view) {
-        LinearLayout map = (LinearLayout) findViewById(R.id.mapSection);
-        if (isMapVisible) {
-            map.setVisibility(View.GONE);
-            isMapVisible = false;
-        }
-        else {
-            map.setVisibility(View.VISIBLE);
-            isMapVisible = true;
-        }
-    }
+    public void onToggleClicked(String selected) {
+        LinearLayout textLayout = (LinearLayout) findViewById(R.id.textSection);
+        LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapSection);
 
-    public void expandText(View view) {
-        LinearLayout text = (LinearLayout) findViewById(R.id.searchByText);
-        if (isTextVisible) {
-            text.setVisibility(View.GONE);
-            isTextVisible = false;
+        if (selected.equals("Map")) {
+            Log.i("STATE", "MAP");
+            if (location == null) {
+                Toast.makeText(this, "Cannot retrieve current location.", Toast.LENGTH_LONG).show();
+            }
+            textLayout.setVisibility(View.GONE);
+            mapLayout.setVisibility(View.VISIBLE);
         }
         else {
-            text.setVisibility(View.VISIBLE);
-            isTextVisible = true;
+            Log.i("STATE", "TEXT");
+            textLayout.setVisibility(View.VISIBLE);
+            mapLayout.setVisibility(View.GONE);
         }
     }
 
@@ -261,19 +278,24 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
     }
 
     private void setCurrentLocation() {
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
             if (mGoogleApiClient.isConnected()) {
                 Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 if (mLastLocation != null) {
                     location = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                     googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+                    Marker marker = googleMap.addMarker(new MarkerOptions().position(location)
+                            .title("Your Current Location")
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    marker.showInfoWindow();
                         NearbyStops nearbyStops = new NearbyStops(this);
                         nearbyStops.execute(location.latitude + "," + location.longitude);
                 }
                 else {
-                    Toast.makeText(this, "Cannot retrieve current location.", Toast.LENGTH_LONG).show();
+                    googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(OAHU, 9));
                 }
+                googleMap.getUiSettings().setZoomControlsEnabled(true);
             }
     }
 
@@ -318,8 +340,24 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
         protected void onPostExecute(String result) {
             if (googleMap != null) {
                 for (LatLng current : markers) {
-                    googleMap.addMarker(new MarkerOptions().position(current));
+                    BusStop stop = getStop(current.latitude, current.longitude);
+                    Marker marker = googleMap.addMarker(new MarkerOptions().position(current)
+                            .title(stop.getStreetName()).snippet("View Bus Stop"));
+                    markerMap.put(marker.getId(), stop);
                 }
+                googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        BusStop stop = markerMap.get(marker.getId());
+                        if (stop != null) {
+                            Intent intent = new Intent(BusStopSearch.this, StopDetails.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelable("stop", stop);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
+                    }
+                });
             }
         }
     }
@@ -334,6 +372,29 @@ public class BusStopTextSearch extends ActionBarActivity implements GoogleApiCli
         url.put("key", this.getResources().getString(R.string.google_browser_key));
         Log.i("URL", url.toString());
         return url;
+    }
+
+    private BusStop getStop(double latitude, double longitude) {
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(
+                    new InputStreamReader(getAssets().open("stops.txt")));
+            String currentLine;
+            String []lineArray;
+            while ((currentLine = br.readLine()) != null) {
+                lineArray = currentLine.split(",");
+                double currentLatitude = Double.parseDouble(lineArray[0]);
+                double currentLongitude = Double.parseDouble(lineArray[2]);
+                if (latitude == currentLatitude && longitude == currentLongitude) {
+                    return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**

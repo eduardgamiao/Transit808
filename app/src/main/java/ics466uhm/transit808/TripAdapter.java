@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -29,10 +30,12 @@ public class TripAdapter extends ArrayAdapter<Trip> {
 
         TextView origin = (TextView) convertView.findViewById(R.id.origin_title);
         TextView destination = (TextView) convertView.findViewById(R.id.destination_title);
+        ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
 
         if (trip != null) {
             origin.setText(trip.getOriginShort());
             destination.setText(trip.getDestinationShort());
+            icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_black_48dp));
         }
 
         return convertView;

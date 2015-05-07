@@ -16,9 +16,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,9 +42,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.maps.android.PolyUtil;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,6 +81,25 @@ public class TripDirections extends ActionBarActivity {
         destination.setText(trip.getDestination());
         changeButtonState();
 
+        Spinner spinner = (Spinner) findViewById(R.id.toggle);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.views,
+                android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selected = (String) parent.getItemAtPosition(position);
+                onToggleClicked(selected);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
         addDrawerItems();
@@ -99,7 +119,7 @@ public class TripDirections extends ActionBarActivity {
                         intent = new Intent(TripDirections.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(TripDirections.this, BusStopTextSearch.class);
+                        intent = new Intent(TripDirections.this, BusStopSearch.class);
                         break;
                     case 2:
                         intent = new Intent(TripDirections.this, TripPlanner.class);
@@ -235,7 +255,7 @@ public class TripDirections extends ActionBarActivity {
                             tripDirections.add(new DirectionStep(instruction, departure, arrival,
                                     route, headsign, startLatitude, startLongitude, endLatitude, endLongitude,
                                     travelMode));
-                        } else {
+                        } else if (travelMode != null && travelMode.equals("WALKING")){
                             tripDirections.add(new DirectionStep(instruction, startLatitude, startLongitude,
                                     endLatitude, endLongitude, travelMode));
                             int walkingStepsSize = directions.routes.get(0).step.get(0).instruction
@@ -275,16 +295,15 @@ public class TripDirections extends ActionBarActivity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
-                    if (step.getTravelMode().equals("TRANSIT")) {
-                        BusStop stop = getStop(step.getStartLatitude(), step.getStartLongitude());
-                        if (stop != null) {
-                            Intent intent = new Intent(TripDirections.this, StopDetails.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putParcelable("stop", stop);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        }
+                    if (googleMap != null) {
+                        DirectionStep step = (DirectionStep) parent.getAdapter().getItem(position);
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(step.getStartLatitude(), step.getStartLongitude()), 15));
+                        Spinner spinner = (Spinner) findViewById(R.id.toggle);
+                        spinner.setSelection(1);
+                        LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
+                        LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapDirections);
+                        textLayout.setVisibility(View.GONE);
+                        mapLayout.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -373,28 +392,26 @@ public class TripDirections extends ActionBarActivity {
         }
     }
 
-    private BusStop getStop(double latitude, double longitude) {
-        BufferedReader br = null;
+    public void onToggleClicked(String selected) {
+        LinearLayout textLayout = (LinearLayout) findViewById(R.id.textDirections);
+        LinearLayout mapLayout = (LinearLayout) findViewById(R.id.mapDirections);
 
-        try {
-            br = new BufferedReader(
-                    new InputStreamReader(getAssets().open("stops.txt")));
-            String currentLine;
-            String []lineArray;
-            while ((currentLine = br.readLine()) != null) {
-                lineArray = currentLine.split(",");
-                double currentLatitude = Double.parseDouble(lineArray[0]);
-                double currentLongitude = Double.parseDouble(lineArray[2]);
-                if (latitude == currentLatitude && longitude == currentLongitude) {
-                    return new BusStop(lineArray[0] + "," + lineArray[2], lineArray[7], lineArray[1]);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (selected.equals("Map")) {
+                Log.i("STATE", "MAP");
+                textLayout.setVisibility(View.GONE);
+                mapLayout.setVisibility(View.VISIBLE);
         }
-
-        return null;
+        else {
+                Log.i("STATE", "TEXT");
+                textLayout.setVisibility(View.VISIBLE);
+                mapLayout.setVisibility(View.GONE);
+        }
     }
+
+    public void viewStop(View view) {
+        Toast.makeText(this, "Yay!!!", Toast.LENGTH_SHORT).show();
+    }
+
 
     public static class DirectionsResult {
         @Key("routes")

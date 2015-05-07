@@ -52,7 +52,7 @@ public class MainActivity extends ActionBarActivity {
                     case 0:
                         break;
                     case 1:
-                        intent = new Intent(MainActivity.this, BusStopTextSearch.class);
+                        intent = new Intent(MainActivity.this, BusStopSearch.class);
                         break;
                     case 2:
                         intent = new Intent(MainActivity.this, TripPlanner.class);
@@ -98,7 +98,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void switchToArrival(View view) {
-        Intent intent = new Intent(this, BusStopTextSearch.class);
+        Intent intent = new Intent(this, BusStopSearch.class);
         startActivity(intent);
     }
 

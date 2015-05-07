@@ -18,15 +18,23 @@
             android:id="@+id/instruction"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:textColor="@color/abc_primary_text_material_light"
-            android:textSize="20sp"/>
+            android:textColor="@color/abc_primary_text_material_light"/>
 
          <TextView
             android:id="@+id/stops"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:visibility="invisible"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/viewStop"
+            android:text="@string/view_stop"
+            android:clickable="true"
+            android:textColor="@color/blue"
+            android:visibility="gone"
+            />
 
     </LinearLayout>
 

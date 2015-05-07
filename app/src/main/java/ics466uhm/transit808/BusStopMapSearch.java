@@ -47,7 +47,7 @@ public class BusStopMapSearch extends ActionBarActivity {
                         intent = new Intent(BusStopMapSearch.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(BusStopMapSearch.this, BusStopTextSearch.class);
+                        intent = new Intent(BusStopMapSearch.this, BusStopSearch.class);
                         break;
                     case 2:
                         intent = new Intent(BusStopMapSearch.this, TripPlanner.class);

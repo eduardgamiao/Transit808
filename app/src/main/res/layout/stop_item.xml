@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="3dp"
+    >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/route"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:minWidth="30dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_gravity="center_vertical|start"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -19,7 +23,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/headsign"
             android:textColor="@color/abc_primary_text_material_light"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:paddingLeft="8dip"/>
 
         <LinearLayout
@@ -30,7 +33,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:paddingLeft="8dip"
             android:text="@string/arrival_text"
             android:visibility="gone"/>
@@ -39,10 +41,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/arrivalTime"
-            android:paddingLeft="8dip"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            android:paddingLeft="8dip"/>
+
+
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/arrivalText"
+            android:paddingLeft="8dip"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
 
     </LinearLayout>
 
