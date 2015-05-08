@@ -3,49 +3,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="3dp"
-    >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/route"
-        android:minWidth="48dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_gravity="center_vertical|start"/>
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/route"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text=" - "/>
+
+        <TextView
             android:id="@+id/headsign"
-            android:textColor="@color/abc_primary_text_material_light"
-            android:paddingLeft="8dip"/>
-
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/abc_primary_text_material_light" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/arrivalTime"
-            android:paddingLeft="8dip"/>
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
+    <TextView
+        android:id="@+id/arrivalTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/arrivalText"
-            android:paddingLeft="8dip"
-            android:textSize="12sp"/>
+    <TextView
+        android:id="@+id/arrivalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="8dip"
+        android:textSize="12sp" />
 
     </LinearLayout>
 

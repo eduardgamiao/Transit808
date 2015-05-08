@@ -156,7 +156,7 @@ public class MainActivity extends ActionBarActivity {
         ArrayList<BusStop> stopList = db.getBusStops();
         ArrayList<Trip> tripList = db.getTrips();
         if (stopList.size() > 0) {
-            BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item, stopList);
+            BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item_main, stopList);
             ListView stops = (ListView) findViewById(R.id.saved_stops_list);
             stops.setVisibility(View.VISIBLE);
             TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);

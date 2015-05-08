@@ -34,7 +34,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal"
         android:drawablePadding="8dp"
-        android:completionThreshold="3"/>
+        android:completionThreshold="3"
+        android:hint="Start Location"/>
 
         <TextView
             android:layout_width="16dp"
@@ -54,6 +55,8 @@
         android:layout_height="wrap_content"
         android:onClick="loadCurrentLocation"
         android:clickable="true"
+        android:textSize="12sp"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="@string/fill_from"/>
 
     <TextView
@@ -74,7 +77,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="fill_horizontal"
-        android:completionThreshold="3"/>
+        android:completionThreshold="3"
+        android:hint="End Location"/>
 
     <TextView
         android:layout_width="16dp"

@@ -28,7 +28,7 @@
     <string name="load_directions">Create Trip</string>
     <string name="title_activity_maps">Map</string>
     <string name="clear_button">X</string>
-    <string name="fill_from">Use Current Location</string>
+    <string name="fill_from"><u>Use Current Location</u></string>
     <string name="invalid_trip">Could not retrieve valid trip.</string>
     <string name="title_activity_route">Route</string>
 

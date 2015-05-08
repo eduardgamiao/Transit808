@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +23,11 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
     // Array list of BusStops.
     private ArrayList<BusStop> busStops;
     private ArrayList<BusStop> originalStops;
+    private int resource;
 
     public BusStopAdapter(Context context, int resource, ArrayList<BusStop> objects) {
         super(context, resource, objects);
+        this.resource = resource;
         this.busStops = objects;
     }
 
@@ -31,16 +35,20 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
         BusStop stop = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.stop_list_item, null);
+            convertView = LayoutInflater.from(getContext()).inflate(resource, null);
         }
 
         TextView title = (TextView) convertView.findViewById(R.id.stop_street_name);
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
         ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+        ImageView close = (ImageView) convertView.findViewById(R.id.close);
 
-        title.setText(stop.getStreetName());
+        title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
         stopID.setText(stop.getStopID());
         icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
+        if (close != null) {
+            close.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_close_black_48dp));
+        }
 
         return convertView;
     }

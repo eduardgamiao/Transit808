@@ -2,11 +2,14 @@ package ics466uhm.transit808;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -21,6 +24,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -61,6 +65,7 @@ public class StopDetails extends ActionBarActivity {
     private String mActivityTitle;
     private String stopID;
     private BusStop stop;
+    private RetrieveFeed feed = new RetrieveFeed();
 
 
     @Override
@@ -106,11 +111,15 @@ public class StopDetails extends ActionBarActivity {
         if (bundle != null) {
             stop = bundle.getParcelable("stop");
             TextView title = (TextView) findViewById(R.id.stop_title);
-            title.setText(stop.getStreetName());
-            RetrieveFeed feed = new RetrieveFeed();
+            title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
             feed.execute(prepareURL(stop.getStopID()));
             changeButtonState();
         }
+
+        Drawable drawable = getResources().getDrawable(R.drawable.ic_refresh_black_48dp);
+        drawable.setBounds(0, 0, (int) (drawable.getIntrinsicWidth() * 0.5), (int) (drawable.getIntrinsicHeight() * 0.5));
+        Button button = (Button) findViewById(R.id.refresh);
+        button.setCompoundDrawables(drawable, null, null, null);
     }
 
     @Override
@@ -265,7 +274,15 @@ public class StopDetails extends ActionBarActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            findViewById(R.id.loading).setVisibility(View.VISIBLE);
+            findViewById(R.id.stop_times).setVisibility(View.GONE);
+        }
+
+        @Override
         protected void onPostExecute(String result) {
+            findViewById(R.id.loading).setVisibility(View.GONE);
+            findViewById(R.id.stop_times).setVisibility(View.VISIBLE);
             if (arrivals.isEmpty()) {
                 TextView text = (TextView) findViewById(R.id.emptyList);
                 text.setVisibility(View.VISIBLE);
@@ -278,6 +295,11 @@ public class StopDetails extends ActionBarActivity {
                 list.setAdapter(adapter);
             }
         }
+    }
+
+    public void refresh(View view) {
+        feed = new RetrieveFeed();
+        feed.execute(prepareURL(stop.getStopID()));
     }
 
     @Override

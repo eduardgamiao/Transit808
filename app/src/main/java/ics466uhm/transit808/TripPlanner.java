@@ -80,8 +80,8 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         from.setText(this.address);
         to.setText("");
 
-        from.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
-        to.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
+        from.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.dropdown_item));
+        to.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.dropdown_item));
 
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
@@ -128,7 +128,7 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
 
     public void loadCurrentLocation(View view) {
         if (this.address.isEmpty() || this.address.equals("")) {
-            Toast.makeText(this, "Cannot Retrieve Current Location", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Cannot retrieve current location", Toast.LENGTH_LONG).show();
         }
         else {
             from.setText(this.address);

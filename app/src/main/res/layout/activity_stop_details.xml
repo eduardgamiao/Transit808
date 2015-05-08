@@ -51,6 +51,16 @@
         android:gravity="center"
         />
 
+        <Button
+            android:id="@+id/refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_refresh_black_48dp"
+            android:text="Refresh"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:onClick="refresh"/>
+
         </LinearLayout>
 
     <View
@@ -58,11 +68,18 @@
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:id="@+id/loading"
+        android:layout_gravity="center_horizontal"/>
+
     <ListView
         android:id="@+id/stop_times"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dip"></ListView>
+        android:padding="3dp"></ListView>
 
     <TextView
         android:id="@+id/emptyList"
