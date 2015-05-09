@@ -45,38 +45,23 @@ public class BusStopMainAdapter extends ArrayAdapter<BusStop> implements Filtera
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
         ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
         ImageView saved = (ImageView) convertView.findViewById(R.id.starIcon);
-        LinearLayout delete = (LinearLayout) convertView.findViewById(R.id.delete);
 
         title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
         stopID.setText(stop.getStopID());
         icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
         saved.setImageDrawable(convertView.getResources().getDrawable(android.R.drawable.star_on));
 
-        delete.setOnClickListener(new View.OnClickListener() {
+        saved.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
-                alertDialogBuilder.setMessage("Remove " + WordUtils.capitalizeFully(stop.getStreetName()) + " from saved bus stops?");
-                        alertDialogBuilder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                DatabaseHandler db = new DatabaseHandler(getContext());
-                                if (db != null) {
-                                    busStops.remove(stop);
-                                    db.deleteStop(Integer.parseInt(stop.getStopID()));
-                                    notifyDataSetChanged();
-                                }
-                            }
-                        });
-
-                alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
+                DatabaseHandler db = new DatabaseHandler(getContext());
+                if (db != null) {
+                    Toast.makeText(getContext(), "Bus stop "
+                            + stop.getStreetName() + " removed.", Toast.LENGTH_LONG).show();
+                    busStops.remove(stop);
+                    db.deleteStop(Integer.parseInt(stop.getStopID()));
+                    notifyDataSetChanged();
+                }
             }
         });
 

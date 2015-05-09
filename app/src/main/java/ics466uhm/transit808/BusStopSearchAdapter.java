@@ -11,6 +11,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -34,7 +35,7 @@ public class BusStopSearchAdapter extends ArrayAdapter<BusStop> implements Filte
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        BusStop stop = getItem(position);
+        final BusStop stop = getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(resource, null);
@@ -55,6 +56,27 @@ public class BusStopSearchAdapter extends ArrayAdapter<BusStop> implements Filte
         else {
             saved.setImageDrawable(convertView.getResources().getDrawable(android.R.drawable.star_off));
         }
+
+        saved.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseHandler db = new DatabaseHandler(getContext());
+                if (db != null) {
+                    if (db.getStop(Integer.parseInt(stop.getStopID())) != null) {
+                        Toast.makeText(getContext(), "Bus stop "
+                                + stop.getStreetName() + " removed.", Toast.LENGTH_LONG).show();
+                        db.deleteStop(Integer.parseInt(stop.getStopID()));
+                        notifyDataSetChanged();
+                    }
+                    else {
+                        Toast.makeText(getContext(), "Bus stop "
+                                + stop.getStreetName() + " added.", Toast.LENGTH_LONG).show();
+                        db.addStop(stop);
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        });
 
         return convertView;
     }

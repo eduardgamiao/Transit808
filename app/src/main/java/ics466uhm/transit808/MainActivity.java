@@ -155,12 +155,9 @@ public class MainActivity extends ActionBarActivity {
         DatabaseHandler db = new DatabaseHandler(this);
         ArrayList<BusStop> stopList = db.getBusStops();
         ArrayList<Trip> tripList = db.getTrips();
-        if (stopList.size() > 0) {
             BusStopMainAdapter adapter = new BusStopMainAdapter(this, R.layout.stop_list_item_main, stopList);
             ListView stops = (ListView) findViewById(R.id.saved_stops_list);
-            stops.setVisibility(View.VISIBLE);
-            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
-            emptyText.setVisibility(View.GONE);
+            stops.setEmptyView(findViewById(R.id.saved_stops_empty));
             stops.setAdapter(adapter);
 
             stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -174,26 +171,19 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                 }
             });
-        }
-        else {
-            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
-            emptyText.setVisibility(View.VISIBLE);
-            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
-            stops.setVisibility(View.GONE);
-        }
         if (tripList.isEmpty()) {
             TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
             emptyText.setVisibility(View.VISIBLE);
-            ListView stops = (ListView) findViewById(R.id.saved_trips_list);
-            stops.setVisibility(View.GONE);
+            ListView trips = (ListView) findViewById(R.id.saved_trips_list);
+            trips.setVisibility(View.GONE);
         }
         else {
-            TripAdapter adapter = new TripAdapter(this, R.layout.trips, tripList);
+            TripAdapter tripAdapter = new TripAdapter(this, R.layout.trips, tripList);
             ListView trips = (ListView) findViewById(R.id.saved_trips_list);
             trips.setVisibility(View.VISIBLE);
             TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
             emptyText.setVisibility(View.GONE);
-            trips.setAdapter(adapter);
+            trips.setAdapter(tripAdapter);
 
             trips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
