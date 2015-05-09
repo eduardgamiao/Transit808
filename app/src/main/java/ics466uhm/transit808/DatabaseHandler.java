@@ -96,6 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @return The bus stop matching the ID.
      */
     public BusStop getStop(int id) {
+        Log.d("Searching for ", " " + id);
         BusStop stop = null;
         SQLiteDatabase db = this.getReadableDatabase();
 

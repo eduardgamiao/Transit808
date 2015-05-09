@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -30,6 +32,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,6 +61,8 @@ import javax.xml.parsers.ParserConfigurationException;
 public class StopDetails extends ActionBarActivity {
     private ListAdapter adapter;
     private ListView view;
+    private static final String SUCCESS = "SUCCESS";
+    private static final String FAILURE = "FAILURE";
 
     // Navigation drawer fields.
     private ListView mDrawerList;
@@ -174,7 +181,7 @@ public class StopDetails extends ActionBarActivity {
      * Async task to read XML from URL.
      * Code from www.androidhive.info/2011/11/android-xml-parsing-tutorial
      */
-    class RetrieveFeed extends AsyncTask<String, Integer, String> {
+    class RetrieveFeed extends AsyncTask<String, Integer, Boolean> {
         static final String PARENT_ELEMENT = "arrival";
         static final String KEY_ID = "id";
         static final String KEY_ROUTE = "route";
@@ -188,38 +195,45 @@ public class StopDetails extends ActionBarActivity {
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
             String xml = getXMLFromURL(params[0]);
             Document doc = this.getDomElement(xml);
-            NodeList nodeList = doc.getElementsByTagName(PARENT_ELEMENT);
+            if (doc != null) {
+                NodeList nodeList = doc.getElementsByTagName(PARENT_ELEMENT);
 
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                Element e = (Element) nodeList.item(i);
-                map.put(KEY_ROUTE, getValue(e, KEY_ROUTE));
-                map.put(KEY_HEADSIGN, getValue(e, KEY_HEADSIGN));
-                map.put(KEY_STOPTIME, getValue(e, KEY_STOPTIME));
-                DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-                try {
-                    Date date = formatter.parse(getValue(e, KEY_DATE) + " " + getValue(e, KEY_STOPTIME));
-                    String output = "(Arriving "
-                            +  DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(), 0).toString()
-                            + ")";
-                    map.put(KEY_TEXT_TIME, output);
-                } catch (ParseException e1) {
-                    e1.printStackTrace();
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    Element e = (Element) nodeList.item(i);
+                    map.put(KEY_ROUTE, getValue(e, KEY_ROUTE));
+                    map.put(KEY_HEADSIGN, getValue(e, KEY_HEADSIGN));
+                    map.put(KEY_STOPTIME, getValue(e, KEY_STOPTIME));
+                    DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+                    try {
+                        Date date = formatter.parse(getValue(e, KEY_DATE) + " " + getValue(e, KEY_STOPTIME));
+                        String output = "(Arriving "
+                                + DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(), 0).toString()
+                                + ")";
+                        map.put(KEY_TEXT_TIME, output);
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    arrivals.add(map);
                 }
-                arrivals.add(map);
+                return true;
             }
-
-            return "SUCCESS";
+            else {
+                return false;
+            }
         }
 
         public String getXMLFromURL(String url) {
             String xml = url;
 
             try {
-                DefaultHttpClient httpClient = new DefaultHttpClient();
+                final HttpParams httpParams = new BasicHttpParams();
+                HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
+                HttpConnectionParams.setSoTimeout(httpParams, 30000);
+                DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
                 HttpPost httpPost = new HttpPost(url);
 
                 HttpResponse httpResponse = httpClient.execute(httpPost);
@@ -280,24 +294,39 @@ public class StopDetails extends ActionBarActivity {
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            findViewById(R.id.loading).setVisibility(View.GONE);
-            findViewById(R.id.stop_times).setVisibility(View.VISIBLE);
-            if (arrivals.isEmpty()) {
-                TextView text = (TextView) findViewById(R.id.emptyList);
-                text.setVisibility(View.VISIBLE);
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                findViewById(R.id.loading).setVisibility(View.GONE);
+                findViewById(R.id.stop_times).setVisibility(View.VISIBLE);
+                if (arrivals.isEmpty()) {
+                    TextView text = (TextView) findViewById(R.id.emptyList);
+                    text.setVisibility(View.VISIBLE);
+                } else {
+                    adapter = new SimpleAdapter(StopDetails.this, arrivals, R.layout.stop_item,
+                            new String[]{KEY_ROUTE, KEY_HEADSIGN, KEY_STOPTIME, KEY_TEXT_TIME},
+                            new int[]{R.id.route, R.id.headsign, R.id.arrivalTime, R.id.arrivalText});
+                    ListView list = (ListView) findViewById(R.id.stop_times);
+                    list.setAdapter(adapter);
+                }
             }
             else {
-                adapter = new SimpleAdapter(StopDetails.this, arrivals, R.layout.stop_item,
-                        new String[]{KEY_ROUTE, KEY_HEADSIGN, KEY_STOPTIME, KEY_TEXT_TIME},
-                        new int[]{R.id.route, R.id.headsign, R.id.arrivalTime, R.id.arrivalText});
-                ListView list = (ListView) findViewById(R.id.stop_times);
-                list.setAdapter(adapter);
+                showError();
             }
         }
     }
 
+    private void showError() {
+        findViewById(R.id.loading).setVisibility(View.GONE);
+        findViewById(R.id.stop_times).setVisibility(View.GONE);
+        TextView error = (TextView) findViewById(R.id.error);
+        if (error != null) {
+            error.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void refresh(View view) {
+        TextView error = (TextView) findViewById(R.id.error);
+        error.setVisibility(View.GONE);
         feed = new RetrieveFeed();
         feed.execute(prepareURL(stop.getStopID()));
     }

@@ -2,7 +2,6 @@ package ics466uhm.transit808;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
@@ -22,7 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,8 +50,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.WeakHashMap;
 
 
 public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -66,7 +62,7 @@ public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.
     private String mActivityTitle;
 
     private ListView listView;
-    BusStopAdapter adapter;
+    BusStopSearchAdapter adapter;
     EditText editText;
     private GoogleMap googleMap;
     private boolean isTextVisible = true;
@@ -93,10 +89,8 @@ public class BusStopSearch extends ActionBarActivity implements GoogleApiClient.
 
         // Adding items to list view.
         //adapter = new ArrayAdapter<BusStop>(this, R.layout.list_item, R.id.busStop, stops);
-        adapter = new BusStopAdapter(this, R.layout.stop_list_item, stops);
+        adapter = new BusStopSearchAdapter(this, R.layout.stop_list_item_main, stops);
         listView.setAdapter(adapter);
-
-
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override

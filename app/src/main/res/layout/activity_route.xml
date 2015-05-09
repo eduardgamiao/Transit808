@@ -100,7 +100,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textDirections">
+        android:id="@+id/textDirections"
+        android:animateLayoutChanges="true">
 
     <ListView
         android:id="@+id/directions"
@@ -113,7 +114,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/mapDirections"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:animateLayoutChanges="true">
 
     <fragment
         android:layout_width="match_parent"

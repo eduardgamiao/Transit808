@@ -1,6 +1,7 @@
 package ics466uhm.transit808;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +20,17 @@ import java.util.List;
 /**
  * Created by eduardgamiao on 3/15/15.
  */
-public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable {
+public class BusStopSearchAdapter extends ArrayAdapter<BusStop> implements Filterable {
     // Array list of BusStops.
     private ArrayList<BusStop> busStops;
     private ArrayList<BusStop> originalStops;
     private int resource;
 
-    public BusStopAdapter(Context context, int resource, ArrayList<BusStop> objects) {
+    public BusStopSearchAdapter(Context context, int resource, ArrayList<BusStop> objects) {
         super(context, resource, objects);
         this.resource = resource;
         this.busStops = objects;
+
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -41,13 +43,17 @@ public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable 
         TextView title = (TextView) convertView.findViewById(R.id.stop_street_name);
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
         ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-        ImageView close = (ImageView) convertView.findViewById(R.id.close);
+        ImageView saved = (ImageView) convertView.findViewById(R.id.starIcon);
 
         title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
         stopID.setText(stop.getStopID());
         icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
-        if (close != null) {
-            close.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_close_black_48dp));
+        DatabaseHandler db = new DatabaseHandler(getContext());
+        if (db.getStop(Integer.parseInt(stop.getStopID())) != null) {
+            saved.setImageDrawable(convertView.getResources().getDrawable(android.R.drawable.star_on));
+        }
+        else {
+            saved.setImageDrawable(convertView.getResources().getDrawable(android.R.drawable.star_off));
         }
 
         return convertView;
