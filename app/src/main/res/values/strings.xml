@@ -14,7 +14,8 @@
 
     <string name="action_example">Example action</string>
 
-    <string name="hea_url">http://api.thebus.org/arrivals/?key=API_key&amp;stop=stop_ID</string>
+    <string name="hea_arrival_url">http://api.thebus.org/arrivals/?key=API_key&amp;stop=stop_ID</string>
+    <string name="hea_route_url">http://api.thebus.org/route/?key=API_key&amp;route=route_name</string>
     <string name="title_activity_main">Transit 808</string>
     <string name="title_activity_arrival">ArrivalActivity</string>
     <string name="arrivalHelpText">Enter Street Name/Bus Stop Number</string>
@@ -64,4 +65,5 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="dialog_delete2">from Saved Bus Stops?</string>
+    <string name="title_activity_route_map">RouteMap</string>
 </resources>

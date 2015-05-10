@@ -1,30 +1,26 @@
 package ics466uhm.transit808;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ScaleDrawable;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.PolyUtil;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.http.HttpEntity;
@@ -43,15 +39,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -72,7 +69,7 @@ public class StopDetails extends ActionBarActivity {
     private String mActivityTitle;
     private String stopID;
     private BusStop stop;
-    private RetrieveFeed feed = new RetrieveFeed();
+    private RetrieveFeedArrival feed = new RetrieveFeedArrival();
 
 
     @Override
@@ -119,7 +116,7 @@ public class StopDetails extends ActionBarActivity {
             stop = bundle.getParcelable("stop");
             TextView title = (TextView) findViewById(R.id.stop_title);
             title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
-            feed.execute(prepareURL(stop.getStopID()));
+            feed.execute(prepareArrivalURL(stop.getStopID()));
             changeButtonState();
         }
 
@@ -138,16 +135,23 @@ public class StopDetails extends ActionBarActivity {
             Log.i("RESUMING", stop.getStreetName());
             TextView title = (TextView) findViewById(R.id.stop_title);
             title.setText(stop.getStreetName());
-            RetrieveFeed feed = new RetrieveFeed();
-            feed.execute(prepareURL(stop.getStopID()));
+            RetrieveFeedArrival feed = new RetrieveFeedArrival();
+            feed.execute(prepareArrivalURL(stop.getStopID()));
             changeButtonState();
         }
     }
 
-    public String prepareURL(String busStopID) {
-        String result = getResources().getString(R.string.hea_url).replace("API_key",
+    private String prepareArrivalURL(String busStopID) {
+        String result = getResources().getString(R.string.hea_arrival_url).replace("API_key",
                 getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
-        Log.i("HEA_URL", result);
+        //Log.i("HEA_URL", result);
+        return result;
+    }
+
+    private  String prepareRouteURL(String busStopID) {
+        String result = getResources().getString(R.string.hea_arrival_url).replace("API_key",
+                getResources().getString(R.string.hea_api)).replace("stop_ID", busStopID);
+        //Log.i("HEA_URL", result);
         return result;
     }
 
@@ -181,7 +185,7 @@ public class StopDetails extends ActionBarActivity {
      * Async task to read XML from URL.
      * Code from www.androidhive.info/2011/11/android-xml-parsing-tutorial
      */
-    class RetrieveFeed extends AsyncTask<String, Integer, Boolean> {
+    class RetrieveFeedArrival extends AsyncTask<String, Integer, Boolean> {
         static final String PARENT_ELEMENT = "arrival";
         static final String KEY_ID = "id";
         static final String KEY_ROUTE = "route";
@@ -189,9 +193,10 @@ public class StopDetails extends ActionBarActivity {
         static final String KEY_STOPTIME = "stopTime";
         static final String KEY_DATE = "date";
         static final String KEY_TEXT_TIME = "arrivalText";
-        private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
+        //private ArrayList<HashMap<String, String>> arrivals = new ArrayList<HashMap<String, String>>();
+        private ArrayList<Bus> buses = new ArrayList<Bus>();
 
-        public RetrieveFeed() {
+        public RetrieveFeedArrival() {
         }
 
         @Override
@@ -202,22 +207,24 @@ public class StopDetails extends ActionBarActivity {
                 NodeList nodeList = doc.getElementsByTagName(PARENT_ELEMENT);
 
                 for (int i = 0; i < nodeList.getLength(); i++) {
-                    HashMap<String, String> map = new HashMap<String, String>();
+                    //HashMap<String, String> map = new HashMap<String, String>();
                     Element e = (Element) nodeList.item(i);
-                    map.put(KEY_ROUTE, getValue(e, KEY_ROUTE));
-                    map.put(KEY_HEADSIGN, getValue(e, KEY_HEADSIGN));
-                    map.put(KEY_STOPTIME, getValue(e, KEY_STOPTIME));
+                    //map.put(KEY_ROUTE, getValue(e, KEY_ROUTE));
+                    //map.put(KEY_HEADSIGN, getValue(e, KEY_HEADSIGN));
+                    //map.put(KEY_STOPTIME, getValue(e, KEY_STOPTIME));
                     DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
                     try {
                         Date date = formatter.parse(getValue(e, KEY_DATE) + " " + getValue(e, KEY_STOPTIME));
                         String output = "(Arriving "
                                 + DateUtils.getRelativeTimeSpanString(date.getTime(), System.currentTimeMillis(), 0).toString()
                                 + ")";
-                        map.put(KEY_TEXT_TIME, output);
+                        Bus bus = new Bus(getValue(e, KEY_ROUTE), getValue(e, KEY_HEADSIGN), getValue(e, KEY_STOPTIME), output);
+                        buses.add(bus);
+                        //map.put(KEY_TEXT_TIME, output);
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
-                    arrivals.add(map);
+                    //arrivals.add(map);
                 }
                 return true;
             }
@@ -298,16 +305,18 @@ public class StopDetails extends ActionBarActivity {
             if (result) {
                 findViewById(R.id.loading).setVisibility(View.GONE);
                 findViewById(R.id.stop_times).setVisibility(View.VISIBLE);
-                if (arrivals.isEmpty()) {
-                    TextView text = (TextView) findViewById(R.id.emptyList);
-                    text.setVisibility(View.VISIBLE);
-                } else {
-                    adapter = new SimpleAdapter(StopDetails.this, arrivals, R.layout.stop_item,
-                            new String[]{KEY_ROUTE, KEY_HEADSIGN, KEY_STOPTIME, KEY_TEXT_TIME},
-                            new int[]{R.id.route, R.id.headsign, R.id.arrivalTime, R.id.arrivalText});
-                    ListView list = (ListView) findViewById(R.id.stop_times);
-                    list.setAdapter(adapter);
-                }
+
+                BusAdapter adapter = new BusAdapter(getApplicationContext(), R.layout.stop_item, buses);
+                ListView list = (ListView) findViewById(R.id.stop_times);
+                list.setEmptyView(findViewById(R.id.emptyList));
+                list.setAdapter(adapter);
+
+                list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // TODO
+                    }
+                });
             }
             else {
                 showError();
@@ -327,8 +336,8 @@ public class StopDetails extends ActionBarActivity {
     public void refresh(View view) {
         TextView error = (TextView) findViewById(R.id.error);
         error.setVisibility(View.GONE);
-        feed = new RetrieveFeed();
-        feed.execute(prepareURL(stop.getStopID()));
+        feed = new RetrieveFeedArrival();
+        feed.execute(prepareArrivalURL(stop.getStopID()));
     }
 
     @Override
