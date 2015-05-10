@@ -177,9 +177,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return trip;
     }
 
-    public void deleteTrip(String id) {
+    public void deleteTrip(String origin, String destination) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TRIP_TABLE, TRIP_ID + " = ? ", new String[] {id});
+        db.delete(TRIP_TABLE, TRIP_ORIGIN + " =  ? AND " + TRIP_DESTINATION + " = ?", new String[] {origin, destination});
         db.close();
     }
 

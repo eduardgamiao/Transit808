@@ -49,7 +49,7 @@ public class BusStopMainAdapter extends ArrayAdapter<BusStop> implements Filtera
         title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
         stopID.setText(stop.getStopID());
         icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
-        saved.setImageDrawable(convertView.getResources().getDrawable(android.R.drawable.star_on));
+        saved.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_delete_black_48dp));
 
         saved.setOnClickListener(new View.OnClickListener() {
             @Override

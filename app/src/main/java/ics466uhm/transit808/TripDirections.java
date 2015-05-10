@@ -71,6 +71,7 @@ public class TripDirections extends ActionBarActivity {
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
+    private DirectionsFetcher df;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -320,7 +321,7 @@ public class TripDirections extends ActionBarActivity {
     }
 
     public ArrayList<DirectionStep> createTrip(Trip trip) {
-        DirectionsFetcher df = new DirectionsFetcher(this);
+        df = new DirectionsFetcher(this);
 
         df.execute(trip.getOrigin(), trip.getDestination());
 
@@ -347,7 +348,7 @@ public class TripDirections extends ActionBarActivity {
 
     public void removeTrip(View view) {
         DatabaseHandler db = new DatabaseHandler(this);
-        db.deleteTrip(trip.getOrigin() + "|" + trip.getDestination());
+        db.deleteTrip(trip.getOrigin(), trip.getDestination());
         changeButtonState();
     }
 

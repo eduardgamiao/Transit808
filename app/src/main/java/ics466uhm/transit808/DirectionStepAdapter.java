@@ -57,6 +57,8 @@ public class DirectionStepAdapter extends ArrayAdapter<DirectionStep> {
             icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_walk_black_48dp));
         }
 
+        notifyDataSetChanged();
+
         viewOnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

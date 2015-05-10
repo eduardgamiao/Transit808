@@ -171,18 +171,10 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                 }
             });
-        if (tripList.isEmpty()) {
-            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
-            emptyText.setVisibility(View.VISIBLE);
-            ListView trips = (ListView) findViewById(R.id.saved_trips_list);
-            trips.setVisibility(View.GONE);
-        }
-        else {
+
             TripAdapter tripAdapter = new TripAdapter(this, R.layout.trips, tripList);
             ListView trips = (ListView) findViewById(R.id.saved_trips_list);
-            trips.setVisibility(View.VISIBLE);
-            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
-            emptyText.setVisibility(View.GONE);
+            trips.setEmptyView(findViewById(R.id.saved_trips_empty));
             trips.setAdapter(tripAdapter);
 
             trips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -196,6 +188,5 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                 }
             });
-        }
     }
 }
