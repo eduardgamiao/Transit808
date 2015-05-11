@@ -1,34 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="wrap_content"
+    android:orientation="horizontal" android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="3dp">
 
-    <TextView
-        android:id="@+id/stop_street_name"
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/abc_primary_text_material_light"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        />
+        android:id="@+id/icon"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/bus_stop_number_label"/>
+        <TextView
+            android:id="@+id/stop_street_name"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/abc_primary_text_material_light" />
 
-    <TextView
-        android:id="@+id/stop_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bus_stop_number_label"/>
+
+        <TextView
+            android:id="@+id/stop_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        </LinearLayout>
     </LinearLayout>
+
+
 
 </LinearLayout>

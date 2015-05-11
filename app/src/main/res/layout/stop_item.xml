@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="3dp"
+    android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/route"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        <TextView
+            android:id="@+id/route"
+            android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
+
+    <!--
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"
+            android:text=" - "/>
+     -->
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -15,35 +28,33 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/headsign"
-            android:textColor="@color/abc_primary_text_material_light"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="8dip"/>
-
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceSmallInverse" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="8dip"
-            android:text="@string/arrival_text"
-            android:visibility="gone"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/arrivalTime"
-            android:paddingLeft="8dip"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            <TextView
+                android:id="@+id/arrivalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmallInverse" />
+
+            <TextView
+                android:id="@+id/arrivalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10sp"
+                android:textSize="12sp"
+                android:textColor="@color/secondary_text_default_material_light"/>
+
+            </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
 
 </LinearLayout>

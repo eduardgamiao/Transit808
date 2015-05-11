@@ -1,19 +1,21 @@
 package ics466uhm.transit808;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,19 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Display display = this.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int height = (int) (size.x * 0.5);
+
+        LinearLayout savedStops = (LinearLayout) findViewById(R.id.savedStops);
+        LinearLayout savedTrips = (LinearLayout) findViewById(R.id.savedTrips);
+        View dividerStops = (View) findViewById(R.id.divider_stops);
+        View dividerTrips = (View) findViewById(R.id.divider_trips);
+        //dividerStops.setLayoutParams(new LinearLayout.LayoutParams());
+        savedStops.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        savedTrips.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
         addDrawerItems();
@@ -54,7 +69,7 @@ public class MainActivity extends ActionBarActivity {
                     case 0:
                         break;
                     case 1:
-                        intent = new Intent(MainActivity.this, BusStopSearchActivity.class);
+                        intent = new Intent(MainActivity.this, BusStopSearch.class);
                         break;
                     case 2:
                         intent = new Intent(MainActivity.this, TripPlanner.class);
@@ -100,7 +115,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void switchToArrival(View view) {
-        Intent intent = new Intent(this, BusStopSearchActivity.class);
+        Intent intent = new Intent(this, BusStopSearch.class);
         startActivity(intent);
     }
 
@@ -157,12 +172,9 @@ public class MainActivity extends ActionBarActivity {
         DatabaseHandler db = new DatabaseHandler(this);
         ArrayList<BusStop> stopList = db.getBusStops();
         ArrayList<Trip> tripList = db.getTrips();
-        if (stopList.size() > 0) {
-            BusStopAdapter adapter = new BusStopAdapter(this, R.layout.stop_list_item, stopList);
+            BusStopMainAdapter adapter = new BusStopMainAdapter(this, R.layout.stop_list_item_main, stopList);
             ListView stops = (ListView) findViewById(R.id.saved_stops_list);
-            stops.setVisibility(View.VISIBLE);
-            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
-            emptyText.setVisibility(View.GONE);
+            stops.setEmptyView(findViewById(R.id.saved_stops_empty));
             stops.setAdapter(adapter);
 
             stops.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -176,26 +188,11 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                 }
             });
-        }
-        else {
-            TextView emptyText = (TextView) findViewById(R.id.saved_stops_empty);
-            emptyText.setVisibility(View.VISIBLE);
-            ListView stops = (ListView) findViewById(R.id.saved_stops_list);
-            stops.setVisibility(View.GONE);
-        }
-        if (tripList.isEmpty()) {
-            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
-            emptyText.setVisibility(View.VISIBLE);
-            ListView stops = (ListView) findViewById(R.id.saved_trips_list);
-            stops.setVisibility(View.GONE);
-        }
-        else {
-            TripAdapter adapter = new TripAdapter(this, R.layout.trips, tripList);
+
+            TripAdapter tripAdapter = new TripAdapter(this, R.layout.trips, tripList);
             ListView trips = (ListView) findViewById(R.id.saved_trips_list);
-            trips.setVisibility(View.VISIBLE);
-            TextView emptyText = (TextView) findViewById(R.id.saved_trips_empty);
-            emptyText.setVisibility(View.GONE);
-            trips.setAdapter(adapter);
+            trips.setEmptyView(findViewById(R.id.saved_trips_empty));
+            trips.setAdapter(tripAdapter);
 
             trips.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -208,6 +205,5 @@ public class MainActivity extends ActionBarActivity {
                     startActivity(intent);
                 }
             });
-        }
     }
 }

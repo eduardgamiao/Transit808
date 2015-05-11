@@ -36,6 +36,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TRIP_ORIGIN = "origin";
     private static final String TRIP_DESTINATION = "destination";
     private static final String TRIP_TITLE = "title";
+    private static final String TRIP_START_COORDINATES = "start_coordinates";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -95,6 +96,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @return The bus stop matching the ID.
      */
     public BusStop getStop(int id) {
+        Log.d("Searching for ", " " + id);
         BusStop stop = null;
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -175,9 +177,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return trip;
     }
 
-    public void deleteTrip(String id) {
+    public void deleteTrip(String origin, String destination) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TRIP_TABLE, TRIP_ID + " = ? ", new String[] {id});
+        db.delete(TRIP_TABLE, TRIP_ORIGIN + " =  ? AND " + TRIP_DESTINATION + " = ?", new String[] {origin, destination});
         db.close();
     }
 

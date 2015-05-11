@@ -1,14 +1,20 @@
 package ics466uhm.transit808;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,28 +22,48 @@ import java.util.List;
 /**
  * Created by eduardgamiao on 3/15/15.
  */
-public class BusStopAdapter extends ArrayAdapter<BusStop> implements Filterable {
+public class BusStopMainAdapter extends ArrayAdapter<BusStop> implements Filterable {
     // Array list of BusStops.
     private ArrayList<BusStop> busStops;
     private ArrayList<BusStop> originalStops;
+    private int resource;
 
-    public BusStopAdapter(Context context, int resource, ArrayList<BusStop> objects) {
+    public BusStopMainAdapter(Context context, int resource, ArrayList<BusStop> objects) {
         super(context, resource, objects);
+        this.resource = resource;
         this.busStops = objects;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        BusStop stop = getItem(position);
+        final BusStop stop = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.stop_list_item, null);
+            convertView = LayoutInflater.from(getContext()).inflate(resource, null);
         }
 
         TextView title = (TextView) convertView.findViewById(R.id.stop_street_name);
         TextView stopID = (TextView) convertView.findViewById(R.id.stop_id);
+        ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+        ImageView saved = (ImageView) convertView.findViewById(R.id.starIcon);
 
-        title.setText(stop.getStreetName());
+        title.setText(WordUtils.capitalizeFully(stop.getStreetName()));
         stopID.setText(stop.getStopID());
+        icon.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
+        saved.setImageDrawable(convertView.getResources().getDrawable(R.drawable.ic_delete_black_48dp));
+
+        saved.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseHandler db = new DatabaseHandler(getContext());
+                if (db != null) {
+                    Toast.makeText(getContext(), "Bus stop "
+                            + stop.getStreetName() + " removed.", Toast.LENGTH_LONG).show();
+                    busStops.remove(stop);
+                    db.deleteStop(Integer.parseInt(stop.getStopID()));
+                    notifyDataSetChanged();
+                }
+            }
+        });
 
         return convertView;
     }

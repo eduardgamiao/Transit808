@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -39,22 +37,8 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -96,8 +80,8 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         from.setText(this.address);
         to.setText("");
 
-        from.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
-        to.setAdapter(new PlacesAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
+        from.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.dropdown_item));
+        to.setAdapter(new PlacesAutoCompleteAdapter(this, R.layout.dropdown_item));
 
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
@@ -118,7 +102,7 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
                         intent = new Intent(TripPlanner.this, MainActivity.class);
                         break;
                     case 1:
-                        intent = new Intent(TripPlanner.this, BusStopSearchActivity.class);
+                        intent = new Intent(TripPlanner.this, BusStopSearch.class);
                         break;
                     case 2:
                         break;
@@ -143,7 +127,12 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
     }
 
     public void loadCurrentLocation(View view) {
-        from.setText(this.address);
+        if (this.address.isEmpty() || this.address.equals("")) {
+            Toast.makeText(this, "Cannot retrieve current location", Toast.LENGTH_LONG).show();
+        }
+        else {
+            from.setText(this.address);
+        }
     }
 
     private void setCurrentLocation() {
@@ -200,14 +189,6 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void clearFields(View view) {
-        EditText from = (EditText) findViewById(R.id.from);
-        EditText to = (EditText) findViewById(R.id.to);
-
-        from.setText("");
-        to.setText("");
     }
 
     @Override
@@ -337,12 +318,39 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         EditText from = (EditText) findViewById(R.id.from);
         EditText to = (EditText) findViewById(R.id.to);
 
-        Intent intent = new Intent(TripPlanner.this, TripDirections.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("trip", new Trip(from.getText().toString(), to.getText().toString(), ""));
-        intent.putExtras(bundle);
-        startActivity(intent);
+        String fromText = from.getText().toString();
+        String toText = to.getText().toString();
+
+        Log.i("TRIP", fromText + " -> " + toText);
+
+        if (fromText.isEmpty() && toText.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.missingInput), Toast.LENGTH_LONG).show();
+        }
+        else if (fromText.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.missingOrigin), Toast.LENGTH_LONG).show();
+        }
+        else if (toText.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.missingDestination), Toast.LENGTH_LONG).show();
+        }
+        else {
+            Intent intent = new Intent(TripPlanner.this, TripDirections.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("trip", new Trip(from.getText().toString(), to.getText().toString(), ""));
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
     }
+
+    public void clearFrom(View view) {
+        EditText from = (EditText) findViewById(R.id.from);
+        from.setText("");
+    }
+
+    public void clearTo(View view) {
+        EditText to = (EditText) findViewById(R.id.to);
+        to.setText("");
+    }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
