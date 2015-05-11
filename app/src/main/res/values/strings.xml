@@ -64,7 +64,7 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_delete2">from Saved Bus Stops?</string>
     <string name="title_activity_route_map">RouteMap</string>
-    <string name="missingInput">Start and End location required.</string>
+    <string name="missingInput">Start and End location missing.</string>
     <string name="missingDestination">End location is missing.</string>
     <string name="missingOrigin">Start Location is missing.</string>
 </resources>
