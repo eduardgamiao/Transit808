@@ -318,13 +318,27 @@ public class TripPlanner extends ActionBarActivity implements GoogleApiClient.Co
         EditText from = (EditText) findViewById(R.id.from);
         EditText to = (EditText) findViewById(R.id.to);
 
-        Log.i("TRIP", from.getText().toString() + " -> " + to.getText().toString());
+        String fromText = from.getText().toString();
+        String toText = to.getText().toString();
 
-        Intent intent = new Intent(TripPlanner.this, TripDirections.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("trip", new Trip(from.getText().toString(), to.getText().toString(), ""));
-        intent.putExtras(bundle);
-        startActivity(intent);
+        Log.i("TRIP", fromText + " -> " + toText);
+
+        if (fromText.isEmpty() && toText.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.missingInput), Toast.LENGTH_LONG).show();
+        }
+        else if (fromText.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.missingOrigin), Toast.LENGTH_LONG).show();
+        }
+        else if (toText.isEmpty()) {
+            Toast.makeText(this, getResources().getString(R.string.missingDestination), Toast.LENGTH_LONG).show();
+        }
+        else {
+            Intent intent = new Intent(TripPlanner.this, TripDirections.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("trip", new Trip(from.getText().toString(), to.getText().toString(), ""));
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
     }
 
     public void clearFrom(View view) {

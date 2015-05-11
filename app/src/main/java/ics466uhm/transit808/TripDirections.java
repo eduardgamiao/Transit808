@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -68,6 +69,7 @@ public class TripDirections extends ActionBarActivity {
     private String overviewPolyline;
     private ArrayList<DirectionStep> tripDirections = new ArrayList<DirectionStep>();
     private HashMap<String, BusStop> markerMap = new HashMap<String, BusStop>();
+    private HashMap<String, DirectionStep> markerDirections = new HashMap<String, DirectionStep>();
 
     static final HttpTransport HTTP_TRANSPORT = AndroidHttp.newCompatibleTransport();
     static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -83,8 +85,8 @@ public class TripDirections extends ActionBarActivity {
         createTrip(trip);
         TextView origin = (TextView) findViewById(R.id.origin);
         TextView destination = (TextView) findViewById(R.id.destination);
-        origin.setText(trip.getOrigin());
-        destination.setText(trip.getDestination());
+        origin.setText(trip.getOriginShort());
+        destination.setText(trip.getDestinationShort());
         changeButtonState();
 
         Spinner spinner = (Spinner) findViewById(R.id.toggle);
@@ -390,7 +392,8 @@ public class TripDirections extends ActionBarActivity {
                                 .position(new LatLng(currentStep.getStartLatitude(), currentStep.getStartLongitude()))
                                 .title(currentStep.getInstruction()).snippet("View Bus Stop"));
                         }
-                        markerMap.put(marker.getId(), getStop(currentStep.getStartLatitude(), currentStep.getStartLongitude()));
+                        //markerMap.put(marker.getId(), getStop(currentStep.getStartLatitude(), currentStep.getStartLongitude()));
+                        markerDirections.put(marker.getId(), currentStep);
                     }
                     DirectionStep lastStep = tripDirections.get(tripDirections.size() - 1);
                     googleMap.addMarker(new MarkerOptions()
@@ -400,18 +403,50 @@ public class TripDirections extends ActionBarActivity {
                     LatLng start = new LatLng(step.getStartLatitude(), step.getStartLongitude());
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 15));
                     googleMap.addPolyline(new PolylineOptions().addAll(PolyUtil
-                             .decode(overviewPolyline)).width(5).color(Color.BLUE));
+                            .decode(overviewPolyline)).width(5).color(Color.BLUE));
                     googleMap.getUiSettings().setZoomControlsEnabled(true);
+                    googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                        @Override
+                        public View getInfoWindow(Marker marker) {
+                            return null;
+                        }
+
+                        @Override
+                        public View getInfoContents(Marker marker) {
+                            View view = getLayoutInflater().inflate(R.layout.direction_step, null);
+
+                            TextView instruction = (TextView) view.findViewById(R.id.instruction);
+                            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+                            TextView viewStop = (TextView) view.findViewById(R.id.viewStop);
+                            TextView stops = (TextView) view.findViewById(R.id.stops);
+
+                            DirectionStep step = markerDirections.get(marker.getId());
+
+                            instruction.setText(step.getInstruction());
+                            stops.setVisibility(View.GONE);
+                            if (step.getTravelMode().equals("TRANSIT")) {
+                                icon.setImageDrawable(view.getResources().getDrawable(R.drawable.ic_directions_bus_black_48dp));
+                                viewStop.setVisibility(View.VISIBLE);
+                            } else {
+                                icon.setImageDrawable(view.getResources().getDrawable(R.drawable.ic_directions_walk_black_48dp));
+                            }
+
+                            return view;
+                        }
+                    });
                     googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
                         public void onInfoWindowClick(Marker marker) {
-                            BusStop stop = markerMap.get(marker.getId());
-                            if (stop != null) {
-                                Intent intent = new Intent(TripDirections.this, StopDetails.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putParcelable("stop", stop);
-                                intent.putExtras(bundle);
-                                startActivity(intent);
+                            DirectionStep step = markerDirections.get(marker.getId());
+                            if (step.getTravelMode().equals("TRANSIT")) {
+                                BusStop stop = getStop(step.getStartLatitude(), step.getStartLongitude());
+                                if (stop != null) {
+                                    Intent intent = new Intent(TripDirections.this, StopDetails.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putParcelable("stop", stop);
+                                    intent.putExtras(bundle);
+                                    startActivity(intent);
+                                }
                             }
                         }
                     });

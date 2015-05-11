@@ -32,7 +32,8 @@
             android:id="@+id/viewStop"
             android:text="@string/view_stop"
             android:clickable="true"
-            android:textColor="@color/blue"
+            android:onClick="viewStop"
+            android:textColor="@color/darkblue"
             android:visibility="gone"
             />
 

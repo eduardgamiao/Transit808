@@ -43,11 +43,14 @@ public class MainActivity extends ActionBarActivity {
         display.getSize(size);
         int height = (int) (size.x * 0.5);
 
-        ListView savedStops = (ListView) findViewById(R.id.saved_stops_list);
-        ListView savedTrips = (ListView) findViewById(R.id.saved_trips_list);
-        savedStops.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
-        savedTrips.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
-        
+        LinearLayout savedStops = (LinearLayout) findViewById(R.id.savedStops);
+        LinearLayout savedTrips = (LinearLayout) findViewById(R.id.savedTrips);
+        View dividerStops = (View) findViewById(R.id.divider_stops);
+        View dividerTrips = (View) findViewById(R.id.divider_trips);
+        //dividerStops.setLayoutParams(new LinearLayout.LayoutParams());
+        savedStops.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+        savedTrips.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
+
         // Navigation drawer.
         mDrawerList = (ListView) findViewById(R.id.navList);
         addDrawerItems();

@@ -34,6 +34,7 @@
         android:visibility="visible"
         android:onClick="saveStop"
         android:gravity="center"
+        style="?android:attr/borderlessButtonStyle"
         />
 
     <Button
@@ -46,6 +47,7 @@
         android:visibility="gone"
         android:onClick="removeStop"
         android:gravity="center"
+        style="?android:attr/borderlessButtonStyle"
         />
 
         <Button
@@ -56,7 +58,8 @@
             android:text="Refresh"
             android:textSize="12sp"
             android:gravity="center"
-            android:onClick="refresh"/>
+            android:onClick="refresh"
+            style="?android:attr/borderlessButtonStyle"/>
 
         </LinearLayout>
 

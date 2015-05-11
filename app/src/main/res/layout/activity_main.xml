@@ -12,6 +12,12 @@
     android:padding="16dp"
     tools:context="ics466uhm.transit808.MainActivity">
 
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/savedStops">
+
     <TextView
         android:id="@+id/favorite_stops_label"
         android:layout_height="wrap_content"
@@ -21,7 +27,8 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray"
+        android:id="@+id/divider_stops"/>
 
     <TextView
         android:layout_height="wrap_content"
@@ -38,6 +45,14 @@
         android:id="@+id/saved_stops_list"
         android:animateLayoutChanges="true"/>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/savedTrips">
+
     <TextView
         android:id="@+id/saved_trips_label"
         android:layout_height="wrap_content"
@@ -48,7 +63,8 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray"
+        android:id="@+id/divider_trips"/>
 
     <TextView
         android:layout_height="wrap_content"
@@ -63,7 +79,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/saved_trips_list"
-        android:visibility="gone"></ListView>
+        android:visibility="gone"/>
+
+    </LinearLayout>
 
 </LinearLayout>
 

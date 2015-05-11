@@ -58,12 +58,13 @@
     <string name="view_by">View By:</string>
     <string name="no_arrival_information">No stops scheduled for this stop.</string>
     <string name="stop_error">Could not retrieve arrival information. Please try again later.</string>
-
-<!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dialog_delete">Delete </string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="dialog_delete2">from Saved Bus Stops?</string>
     <string name="title_activity_route_map">RouteMap</string>
+    <string name="missingInput">Start and End location required.</string>
+    <string name="missingDestination">End location is missing.</string>
+    <string name="missingOrigin">Start Location is missing.</string>
 </resources>
